@@ -20,7 +20,7 @@
 project/
 ├── PRD.md                  # 长期：项目当前最终需求状态
 ├── PRD-V1.md …             # 长期：版本化需求（可选，命名不限，可用任意 @xxx.md 作为需求入口）
-├── AGENT.md                # 长期：AI Coding 规则
+├── AGENTS.md                # 长期：AI Coding 规则
 └── artifacts/
     ├── architecture.md     # 长期：架构约束（只有架构真正变化时才更新）
     ├── prd-sub.md          # 临时：当前子需求
@@ -31,12 +31,14 @@ project/
 
 临时文件在子需求完成后**清空内容、绝不删除**，长期知识选择性沉淀到 PRD.md / architecture.md。
 
+plan.md 定位为**跨 Step 方案决策记录**（短文档，不复述 Step 细节）；长期性技术选型在 Phase 2 即时沉淀进 architecture.md，编码层栈约束（框架版本、目录约定、测试规则）进 AGENTS.md。
+
 ## 安装
 
 复制到 ZCode 的用户级 skill 目录：
 
 ```bash
-git clone https://gitee.com/echola/lean-coding-workflow1 ~/.agents/skills/lean-coding-workflow
+git clone https://gitee.com/echola/lean-coding-workflow ~/.agents/skills/lean-coding-workflow
 ```
 
 或项目级：`<project>/.agents/skills/lean-coding-workflow/`。
@@ -60,3 +62,18 @@ lean-coding-workflow/
 ```
 
 工作流会在两个关键点暂停等待确认（子需求确认、执行计划确认），其余时间自动逐步执行。
+
+## Context Loading Matrix（各 Phase 读取矩阵）
+
+> 供人查阅的汇总视图；执行时的规则以 SKILL.md 各 Phase 小节为准，模型执行时无需读取本表。
+
+| Phase | 需求文档(@xxx.md / PRD-Vx) | PRD.md | AGENTS.md | architecture.md | prd-sub.md | plan.md | execution-plan.md | memory.md | 源码 |
+|---|---|---|---|---|---|---|---|---|---|
+| Phase 0 初始化（仅检查存在性） | ❌ | ⚠️ | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Phase 1 需求分析 | ✅（用户 @ 指定） | ⚠️（仅当用户未指定文档时按需） | ✅ | ⚠️ | ❌（本阶段生成） | ❌ | ❌ | ❌ | ⚠️ |
+| Phase 2 方案规划 | ❌ | ❌ | ✅ | ⚠️（长期选型可写入） | ✅ | ❌（本阶段生成） | ❌（本阶段生成） | ⚠️ | ⚠️ |
+| Phase 3 Step 执行 | ❌ | ❌ | ✅ | ⚠️ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| Phase 4 子需求完成 | ❌ | ✅（写） | ✅ | ⚠️（判断后写） | ✅（读后清空） | ✅（清空） | ✅（读最终状态后清空） | ✅（提炼后清空） | ⚠️ |
+| Phase 5 问题排查 | ⚠️（必要历史需求文档） | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ❌ | ⚠️（必要时更新） | ⚠️ | ✅ |
+
+✅ 必须读取　⚠️ 只有必要时读取（默认禁止）　❌ 默认禁止读取

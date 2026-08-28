@@ -31,7 +31,7 @@ description: Lean, token-efficient, document-driven AI coding workflow: requirem
 |---|---|
 | PRD.md | Current Requirements（项目当前需求） |
 | @xxx.md / PRD-Vx.md | Requirement Source（用户指定的需求来源） |
-| AGENT.md | Coding Rules（AI 编码规则） |
+| AGENTS.md | Coding Rules（AI 编码规则） |
 | artifacts/architecture.md | Permanent Constraints（长期架构约束） |
 | artifacts/prd-sub.md | Current Scope（当前子需求） |
 | artifacts/plan.md | Current Design（当前子需求整体方案） |
@@ -56,7 +56,7 @@ description: Lean, token-efficient, document-driven AI coding workflow: requirem
 project/
 ├── PRD.md                  # 长期：项目当前最终需求状态
 ├── PRD-V1.md …             # 长期：版本化需求（可选示例，命名不限）
-├── AGENT.md                # 长期：AI Coding 规则
+├── AGENTS.md                # 长期：AI Coding 规则
 └── artifacts/              # Workflow 自管理的临时工作区
     ├── architecture.md     # 长期：架构约束
     ├── prd-sub.md          # 临时：当前子需求
@@ -99,15 +99,15 @@ Phase 4 子需求完成
 ### Phase 0：项目初始化
 
 - 进入：项目首次使用本 Skill，或用户明确要求初始化工作流。
-- 读取：项目目录结构；仅**检查** AGENT.md / PRD.md / artifacts/ 是否存在，不读内容。
-- 动作：创建缺失的 AGENT.md、PRD.md、artifacts/ 及五个工作文件（空骨架）；已存在的**禁止覆盖**。
+- 读取：项目目录结构；仅**检查** AGENTS.md / PRD.md / artifacts/ 是否存在，不读内容。
+- 动作：创建缺失的 AGENTS.md、PRD.md、artifacts/ 及五个工作文件（空骨架）；已存在的**禁止覆盖**。
 - 禁止：业务需求分析、生成子需求/Plan/Execution Plan、编码、运行测试、扫描源码目录。
 - 退出：Workflow 所需基础文件齐备。
 
 ### Phase 1：需求分析
 
 - 进入：用户提出新的开发需求。
-- 必须读取：用户当前对话 + 用户 @ 指定的需求文档 + AGENT.md。
+- 必须读取：用户当前对话 + 用户 @ 指定的需求文档 + AGENTS.md。
 - 按需读取：artifacts/architecture.md、相关源码（仅当缺少该信息会阻碍需求正确分析时）。
 - 默认禁止读取：PRD.md、其他需求文档、plan.md、execution-plan.md、memory.md。
 - 动作：生成 `artifacts/prd-sub.md` — AI 梳理后的**可执行子需求**，不是需求文档的复制；
@@ -121,14 +121,20 @@ Phase 4 子需求完成
 ### Phase 2：方案规划
 
 - 进入：用户确认 prd-sub.md。
-- 必须读取：artifacts/prd-sub.md + AGENT.md。
+- 必须读取：artifacts/prd-sub.md + AGENTS.md。
 - 按需读取：artifacts/architecture.md、相关源码、artifacts/memory.md
   （仅当本子需求此前已有执行记录，或历史执行信息会影响当前方案时）。
 - 默认禁止读取：原始需求文档、PRD-Vx.md、PRD.md、整个源码目录。
-- 动作 1：生成 `artifacts/plan.md` — 回答"这个子需求整体准备怎么实现？"
+- 动作 1：生成 `artifacts/plan.md` — **跨 Step 方案决策记录**：只记横跨多个 Step 的决策与理由
+  （技术方案选型、数据模型、API 契约、模块划分、依赖、风险、整体验证策略），
+  不复述 Step 级实现细节（那属于 execution-plan.md），保持短（建议 ≤100 行）。
 - 动作 2：生成 `artifacts/execution-plan.md` — Step 队列，**只含未完成工作**。
   每个 Step 必须：目标 / 范围 / 涉及文件 / 实现方式 / 验证方式 / 完成标准明确；
   独立可执行、可验证、可恢复、不依赖完整历史上下文；不过度细碎。
+- 动作 3：若本次做出**长期性技术选型**（新项目首次定栈、更换存储 / 框架等），
+  立即写入 artifacts/architecture.md 的技术选型部分（不等 Phase 4）；
+  Phase 2 对 architecture.md 的写入仅限长期技术选型，其余架构内容仍按 Phase 4 判断。
+  编码层面的栈约束（框架版本、目录约定、测试规则）同步 AGENTS.md。
 - 禁止：修改业务源码、执行任何 Step、提前标记 DONE、写执行结果到 memory.md、修改 PRD.md。
 - 退出：plan.md + execution-plan.md 生成且用户确认。
 
@@ -141,7 +147,7 @@ Phase 4 子需求完成
 
 每个 Step 的执行循环：
 
-1. 读取 artifacts/execution-plan.md + AGENT.md → 第一个未完成 Step = 当前 Step。
+1. 读取 artifacts/execution-plan.md + AGENTS.md → 第一个未完成 Step = 当前 Step。
 2. 按需定位并读取当前 Step 相关源码（Progressive Context Loading，见 §4）。
 3. Context Sufficient = YES → 实现当前 Step。
    禁止：实现后续 Step、修改无关模块、重构与当前 Step 无关的代码。
@@ -184,7 +190,7 @@ PENDING → IN_PROGRESS → VERIFYING → DONE      （写 memory.md → 从计�
 | 跨模块重大修改 | 按风险扩大范围 |
 
 完整测试套件只在必要时执行；子需求级完整验证在 Phase 4 做。
-项目已有测试规范时优先遵守 AGENT.md。
+项目已有测试规范时优先遵守 AGENTS.md。
 
 **Phase 3 默认禁止读取**：原始需求文档、PRD-Vx.md、PRD.md、prd-sub.md、plan.md、memory.md。
 禁止为了"确认一下需求"而重读这些文档；当前 Step 缺关键信息时，先找更小范围的信息源。
@@ -204,7 +210,7 @@ architecture.md 仅当 Step 涉及新模块、模块边界、目录结构、技�
    按风险执行 compile / unit / integration / API test / 验收标准检查，只执行与本子需求相关的验证）。
 2. **同步 PRD.md**：写入本次子需求最终需求结果。禁止复制 execution-plan、memory 内容、测试日志。
 3. **判断是否更新 architecture.md**：核心问题 ——"本次是否改变了未来开发必须遵守的长期架构规则？"
-   NO 不更新；YES 才更新（判断标准见 document-contracts.md）。
+   NO 不更新；YES 才更新（判断标准见 document-contracts.md）。Phase 2 已写入的长期选型不重复写入。
 4. **提炼 memory.md**：只提炼长期价值信息（重要技术 / 架构决策、可复现问题与解决方案），
    同步到 PRD.md / architecture.md / 项目已有长期文档。**禁止新建任何长期记忆文件。**
 5. **清空临时文档**：清空 prd-sub.md / plan.md / execution-plan.md / memory.md 的内容，
@@ -260,7 +266,7 @@ Level 4  必要的历史信息 / 类似实现
 YES 的条件（全部满足）：
 
 1. 当前 Step 明确
-2. AGENT.md 相关规则明确
+2. AGENTS.md 相关规则明确
 3. 必要架构约束明确
 4. 相关源码已定位
 5. 必要依赖已理解
@@ -276,22 +282,10 @@ NO → 明确说出"当前到底缺少什么信息"，只读取能补足该缺�
 
 禁止：读取整个 src/、所有 Controller、所有 Service、所有 Repository、全部测试、全部配置、整个项目源码。
 
-### Context Loading Matrix（各 Phase 允许读取的文件）
+### 各 Phase 读取规则
 
-| Phase | 需求文档(@xxx.md / PRD-Vx) | PRD.md | AGENT.md | architecture.md | prd-sub.md | plan.md | execution-plan.md | memory.md | 源码 |
-|---|---|---|---|---|---|---|---|---|---|
-| Phase 0 初始化（仅检查存在性） | ❌ | ⚠️ | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Phase 1 需求分析 | ✅（用户 @ 指定） | ⚠️（仅当用户未指定文档时按需） | ✅ | ⚠️ | ❌（本阶段生成） | ❌ | ❌ | ❌ | ⚠️ |
-| Phase 2 方案规划 | ❌ | ❌ | ✅ | ⚠️ | ✅ | ❌（本阶段生成） | ❌（本阶段生成） | ⚠️ | ⚠️ |
-| Phase 3 Step 执行 | ❌ | ❌ | ✅ | ⚠️ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| Phase 4 子需求完成 | ❌ | ✅（写） | ✅ | ⚠️（判断后写） | ✅（读后清空） | ✅（清空） | ✅（读最终状态后清空） | ✅（提炼后清空） | ⚠️ |
-| Phase 5 问题排查 | ⚠️（必要历史需求文档） | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ❌ | ⚠️（必要时更新） | ⚠️ | ✅ |
-
-```
-✅ 必须读取
-⚠️ 只有必要时读取（默认禁止）
-❌ 默认禁止读取
-```
+每个 Phase 允许 / 按需 / 禁止读取的文件已在 §3 各 Phase 小节内联规定，**以那些小节为准**，
+无需汇总表。完整的跨 Phase 矩阵总表保存在仓库 README.md 中（供人查阅），执行时不要读取它。
 
 ## 5. 用户确认规则
 

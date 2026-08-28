@@ -9,7 +9,7 @@
 |---|---|---|
 | PRD.md | 项目当前最终需求状态 | Permanent |
 | @xxx.md / PRD-Vx.md | 用户指定的需求来源 | Permanent |
-| AGENT.md | AI Coding 行为规范 | Permanent |
+| AGENTS.md | AI Coding 行为规范 | Permanent |
 | artifacts/architecture.md | 长期架构约束 | Permanent（内容长期有效） |
 | artifacts/prd-sub.md | 当前子需求 | Temporary（清空不删除） |
 | artifacts/plan.md | 当前子需求整体方案 | Temporary（清空不删除） |
@@ -34,7 +34,7 @@
 - Phase 1 用户指定时必读；Phase 2 / Phase 3 默认禁止重读（除非当前任务确实无法完成）。
 - 禁止自动搜索并读取所有 PRD-Vx.md。
 
-### AGENT.md
+### AGENTS.md
 
 - 职责：技术栈、编码规范、命名规范、项目约定、测试规则、AI 修改代码必须遵守的规则、开发限制。
 - Phase 1 / 2 / 3 必读；Phase 0 已存在时禁止覆盖。
@@ -46,6 +46,8 @@
 - **更新判断（写之前必答）**："这个变化是否会成为未来开发必须遵守的长期架构规则？"
   - NO → 不更新。
   - YES → 更新。
+- 例外：Phase 2 做出长期性技术选型时，立即写入技术选型部分（不等 Phase 4）；
+  Phase 2 对本文件的写入**仅限长期技术选型**，其余架构内容仍按 Phase 4 判断。
 - 需要更新的例子：整体目录结构变化、新增长期模块边界、新增接口架构规范、
   新增统一技术组件、技术栈变化、数据存储架构变化、Agent / Tool 架构变化、新增长期开发规则。
 - 不需要更新的例子：新增普通 Class / Controller / Service / DTO、普通业务逻辑修改、
@@ -59,9 +61,11 @@
 - 临时，只服务当前子需求；完成后清空内容、禁止删除文件。
 - 是 AI 梳理后的需求，不是需求文档的复制。
 
-### artifacts/plan.md — 当前子需求整体方案
+### artifacts/plan.md — 当前子需求跨 Step 方案决策记录
 
-- 临时，回答"整体准备怎么实现"；完成后清空内容、禁止删除文件。
+- 临时，只记横跨多个 Step 的决策与理由（选型、数据模型、API 契约、模块划分、风险）；
+  不复述 Step 级实现细节；保持短（建议 ≤100 行）。
+- 完成后清空内容、禁止删除文件。
 
 ### artifacts/execution-plan.md — 剩余待执行工作（Future Work）
 

@@ -1,6 +1,6 @@
 ---
 name: lean-coding-workflow
-description: Lean, token-efficient, document-driven AI coding workflow: requirement → sub-requirement → plan → one-step-at-a-time execution → minimal verification → selective memory. Use whenever the user starts a feature or development task and wants structured workflow execution ("按这个工作流实现…", "@xxx.md 实现差旅审批", "初始化 lean workflow", "精益编码"), asks to continue or resume an execution plan, or reports a bug / asks why something was implemented and needs investigation or rollback. Core rule: Context-on-Demand — read only the minimum files required, never speculatively.
+description: "Lean, token-efficient, document-driven AI coding workflow: requirement → sub-requirement → plan → one-step-at-a-time execution → minimal verification → selective memory. Use whenever the user starts a feature or development task and wants structured workflow execution (\"按这个工作流实现…\", \"@xxx.md 实现差旅审批\", \"初始化 lean workflow\", \"精益编码\"), asks to continue or resume an execution plan, or reports a bug / asks why something was implemented and needs investigation or rollback. Core rule: Context-on-Demand — read only the minimum files required, never speculatively."
 ---
 
 # Lean Coding Workflow

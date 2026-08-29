@@ -1,37 +1,88 @@
-# Lean Coding Workflow
+# lean-coding-workflow
 
 > **Plan enough. Read only what you need. Execute one step at a time. Remember what matters.**
 > 计划足够即可，按需读取上下文，逐步执行，只记住真正重要的事情。
 
-一个轻量、Token 高效、文档驱动、可恢复执行的 AI Coding Workflow Skill。
+一套给 AI Agent 用的编码工作流协议：文档驱动需求与方案，用最少可靠上下文逐步实现，把可恢复状态写在文件里，而不是对话历史里。
 
-## 核心特性
+## 为什么写这个 Skill
 
-- **Context-on-Demand（按需读取上下文）**：核心原则 "Never read context speculatively"（禁止猜测性读取上下文）。只有"不读取就无法可靠完成当前任务"时才读取，上下文足够后立即停止。
+直接目的：**减少 `context_usage`。** 少读、读准、读完就停，把窗口留给真正要改的代码。
+
+默认的 AI 编码过程往往是：把能读的都读一遍 → 一口气改很多文件 → 跑一轮测试（或干脆不测）→ 对话一长或中断，上下文和决策就丢了。`context_usage` 被噪声堆高，真正有用的信息反而被挤掉。
+
+这会带来三个实际问题：
+
+1. **上下文被噪声填满。** Agent 因为「这个文件可能有用」就读它。Token 花在无关代码上，真正该改的地方反而看不清——又贵、又慢、还更容易改错。
+2. **执行不可恢复。** 一次实现一串需求，失败了不知道改到哪、该回退什么。换一次会话，计划只活在上一轮对话里。
+3. **知识和日志混在一起。** 把执行过程、架构决策、需求原文、测试输出塞进同一个无限增长的 memory，下次还得整份再读一遍——等于没有记忆，还继续推高 `context_usage`。
+
+这个 Skill 不是又一个「请仔细思考再动手」的提示词。它把上述失败模式写成**可执行约束**：什么时候读、读到什么程度停、何时问人、一次改多大、验证改多大、什么进长期文档、什么做完就清掉。
+
+目标是压低 `context_usage`；手段是语义判断「这一步够不够」，而不是盯着百分比刹车。
+
+## 设计理念
+
+### 四句总纲
+
+| 理念 | 含义 |
+|---|---|
+| **Plan enough** | 对齐到位就动手：不欠计划，也不过度设计。 |
+| **Read only what you need** | 按需读取上下文，禁止猜测性读取。问的是「不读这个文件，当前任务是否无法可靠完成」，不是「读了会不会更有把握」。够了立刻停。 |
+| **Execute one step at a time** | 执行计划只保留未完成工作。完成即删、失败保留。验证范围跟着修改范围走，不每个 Step 跑全量测试。 |
+| **Remember what matters** | 每个文件只有一个职责。临时文档服务当前子需求，完成后清空不删除；只有会约束未来开发的决策才进长期文档。 |
+
+两条刻意不做的选择：
+
+- **不拿 Token 数字当刹车。** 要减少的是实际读进去的内容，从而压低 `context_usage`；但不计算 `remaining_tokens`，不设「context 用了 60% 就别读了」。只做语义判断：当前上下文是否已经足够可靠完成这一步。
+- **不追求「知道整个项目」。** 目标是 Minimum Reliable Context：带着完成当前任务所需的最小可靠信息把事做对，而不是把仓库装进脑子。
+
+### 落地形态
+
 - **文档驱动开发**：需求 → 子需求 → 方案 → 执行计划 → 逐步执行 → 验证 → 记忆 → 收尾。
-- **严格 Phase 状态机**：Phase 0 初始化 → Phase 1 需求分析 → 用户确认① → Phase 2 方案规划 → 用户确认② → Phase 3 逐步执行 → Phase 4 子需求完成；任意阶段可进入 Phase 5 问题排查 / 恢复 / 回退。
-- **一次只执行一个 Step**：execution-plan.md 只保存剩余工作（Future Work），完成即删、失败保留，天然支持中断恢复。
-- **Minimal Verification**：验证范围与修改影响匹配，禁止每个 Step 都跑完整测试套件。
-- **语义化 Context Sufficiency**：不计算 Token / Context Window 数字，只判断"当前上下文是否足以可靠完成任务"。
+- **严格 Phase 状态机**：Phase 0 初始化 → Phase 1 需求分析 → 确认① → Phase 2 方案规划 → 确认② → Phase 3 逐步执行 → Phase 4 子需求完成；任意阶段可进入 Phase 5 问题排查 / 恢复 / 回退。
+- **长期 / 临时两层文档**：
+  - 长期：`PRD.md`（需求状态）、`AGENTS.md`（编码规则）、`architecture.md`（架构约束）
+  - 临时：`prd-sub.md` / `plan.md` / `execution-plan.md` / `memory.md`
+
+## 工作流
+
+```
+Phase 0 项目初始化
+   ↓
+Phase 1 需求分析 ──→ 【用户确认①】prd-sub.md
+   ↓
+Phase 2 方案规划 ──→ 【用户确认②】plan.md + execution-plan.md
+   ↓
+Phase 3 Step 执行（一次一个 Step：实现 → 最小验证 → 记 memory → 从计划删除）
+   ↓
+Phase 4 子需求完成（同步 PRD / 按需更新 architecture → 清空临时文档）
+
+任意阶段出问题 → Phase 5 问题排查 / 恢复 / 回退
+```
+
+正常流程只有两个强制确认点。Step 执行过程中不逐步请示；仅在需求歧义、重大架构变化、计划与代码冲突、失败无法自行解决、高风险操作时暂停。
 
 ## 项目目录约定
 
 ```
 project/
 ├── PRD.md                  # 长期：项目当前最终需求状态
-├── PRD-V1.md …             # 长期：版本化需求（可选，命名不限，可用任意 @xxx.md 作为需求入口）
-├── AGENTS.md                # 长期：AI Coding 规则
+├── PRD-V1.md …             # 长期：版本化需求（可选；也可用任意 @xxx.md 作为需求入口）
+├── AGENTS.md               # 长期：AI 编码规则
 └── artifacts/
     ├── architecture.md     # 长期：架构约束（只有架构真正变化时才更新）
     ├── prd-sub.md          # 临时：当前子需求
-    ├── plan.md             # 临时：当前子需求整体方案
+    ├── plan.md             # 临时：跨 Step 方案决策（短，不复述 Step 细节）
     ├── execution-plan.md   # 临时：剩余待执行 Step
     └── memory.md           # 临时：当前子需求执行记忆
 ```
 
-临时文件在子需求完成后**清空内容、绝不删除**，长期知识选择性沉淀到 PRD.md / architecture.md。
+临时文件在子需求完成后**清空内容、绝不删除**，长期知识选择性沉淀到 `PRD.md` / `architecture.md`。
 
-plan.md 定位为**跨 Step 方案决策记录**（短文档，不复述 Step 细节）；长期性技术选型在 Phase 2 即时沉淀进 architecture.md，编码层栈约束（框架版本、目录约定、测试规则）进 AGENTS.md。
+- `plan.md` 只记横跨多个 Step 的决策与理由。
+- 长期性技术选型在 Phase 2 即时写入 `architecture.md`。
+- 编码层栈约束（框架版本、目录约定、测试规则）进 `AGENTS.md`。
 
 ## 安装
 
@@ -72,7 +123,23 @@ git clone https://gitee.com/echola/lean-coding-workflow.git ~/.claude/skills/lea
 
 **项目级**：clone 到 `<project>/.claude/skills/lean-coding-workflow/`。
 
-## 文件结构
+## 使用
+
+必须通过 `/lean-coding-workflow` 显式调用。`@xxx.md` 是当前子需求输入，不是 Skill。
+
+```
+/lean-coding-workflow [@需求文档]
+```
+
+```
+/lean-coding-workflow @PRD-V1.md
+/lean-coding-workflow @docs/travel-approval.md
+/lean-coding-workflow @requirements/mqtt.md
+```
+
+工作流在两个关键点暂停等待确认（子需求、执行计划），其余时间自动逐步执行。
+
+## 仓库结构
 
 ```
 lean-coding-workflow/
@@ -82,7 +149,7 @@ lean-coding-workflow/
 │   └── lean-coding-workflow/
 │       ├── SKILL.md                # 核心执行规则
 │       ├── agents/
-│       │   └── openai.yaml         # skill-creator UI 元数据（列表展示名 / chips / 默认 prompt）
+│       │   └── openai.yaml         # UI 元数据（列表展示名 / chips / 默认 prompt）
 │       └── references/
 │           ├── file-formats.md     # prd-sub / plan / execution-plan / memory 格式模板
 │           └── document-contracts.md
@@ -90,25 +157,6 @@ lean-coding-workflow/
 ├── LICENSE
 └── README.md
 ```
-
-`agents/openai.yaml` 遵循 skill-creator 推荐约定，供 Skill 列表与 chips 展示使用，不参与工作流执行逻辑。
-## 使用
-
-在 Codex /Cursor  中直接提出开发需求即可触发，例如：
-
-/lean-coding-workflow [@需求文档]
-
-示例：
-
-/lean-coding-workflow @PRD-V1.md
-/lean-coding-workflow @docs/travel-approval.md
-/lean-coding-workflow @requirements/mqtt.md
-
-@xxx.md 是当前子需求输入，不是 Skill。
-
-Skill 必须通过 `/lean-coding-workflow` 显式调用。
-
-工作流会在两个关键点暂停等待确认（子需求确认、执行计划确认），其余时间自动逐步执行。
 
 ## Context Loading Matrix（各 Phase 读取矩阵）
 

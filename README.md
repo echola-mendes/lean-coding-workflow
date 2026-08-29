@@ -91,11 +91,19 @@ lean-coding-workflow/
 
 ## 使用
 
-在 Cursor / Codex 中直接提出开发需求即可触发，例如：
+在 Codex /Cursor  中直接提出开发需求即可触发，例如：
 
-```
-@docs/travel.md 实现差旅审批
-```
+/lean-coding-workflow [@需求文档]
+
+示例：
+
+/lean-coding-workflow @PRD-V1.md
+/lean-coding-workflow @docs/travel-approval.md
+/lean-coding-workflow @requirements/mqtt.md
+
+@xxx.md 是当前子需求输入，不是 Skill。
+
+Skill 必须通过 `/lean-coding-workflow` 显式调用。
 
 工作流会在两个关键点暂停等待确认（子需求确认、执行计划确认），其余时间自动逐步执行。
 

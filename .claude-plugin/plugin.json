@@ -1,0 +1,11 @@
+{
+  "name": "lean-coding-workflow",
+  "version": "1.0.0",
+  "description": "Document-driven coding workflow with on-demand context, one-step execution, minimal verification, and recoverable state.",
+  "author": {
+    "name": "echola"
+  },
+  "repository": "https://gitee.com/echola/lean-coding-workflow",
+  "license": "Apache-2.0",
+  "keywords": ["workflow", "coding", "context-on-demand", "document-driven"]
+}

@@ -35,27 +35,63 @@ plan.md 定位为**跨 Step 方案决策记录**（短文档，不复述 Step �
 
 ## 安装
 
-复制到 ZCode 的用户级 skill 目录：
+### Codex / Cursor
+
+**全局**（本机所有项目）：
 
 ```bash
-git clone https://gitee.com/echola/lean-coding-workflow ~/.agents/skills/lean-coding-workflow
+npx skills add https://gitee.com/echola/lean-coding-workflow.git \
+  --skill lean-coding-workflow -a cursor -a codex -g --copy -y
 ```
 
-或项目级：`<project>/.agents/skills/lean-coding-workflow/`。
+**项目级**（写入当前仓库，可随 git 共享）：
+
+```bash
+npx skills add https://gitee.com/echola/lean-coding-workflow.git \
+  --skill lean-coding-workflow -a cursor -a codex --copy -y
+```
+
+只装其中一个 Agent 时去掉对应 `-a`，例如只装 Cursor：`-a cursor`。GitHub 源把 URL 换成 `echola-mendes/lean-coding-workflow` 即可。
+
+### Claude Code
+
+本仓库即 plugin 根目录（`.claude-plugin/plugin.json` + `skills/`）。启用 plugin 后会自动加载 skill，**不要**再执行 `npx skills add -a claude-code`。
+
+**会话试用**：
+
+```bash
+git clone https://gitee.com/echola/lean-coding-workflow.git
+claude --plugin-dir ./lean-coding-workflow
+```
+
+**持久安装**（本机所有项目，下次启动自动加载为 `lean-coding-workflow@skills-dir`）：
+
+```bash
+git clone https://gitee.com/echola/lean-coding-workflow.git ~/.claude/skills/lean-coding-workflow
+```
+
+**项目级**：clone 到 `<project>/.claude/skills/lean-coding-workflow/`。
 
 ## 文件结构
 
 ```
 lean-coding-workflow/
-├── SKILL.md                        # 核心执行规则（触发条件、Phase 状态机、读取矩阵、Token 规则）
-└── references/
-    ├── file-formats.md             # prd-sub / plan / execution-plan / memory 格式模板
-    └── document-contracts.md       # 文件职责、生命周期、architecture 更新判断、清理规则
+├── .claude-plugin/
+│   └── plugin.json                 # Claude plugin 清单
+├── skills/
+│   └── lean-coding-workflow/
+│       ├── SKILL.md                # 核心执行规则
+│       └── references/
+│           ├── file-formats.md     # prd-sub / plan / execution-plan / memory 格式模板
+│           └── document-contracts.md
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
 
 ## 使用
 
-在 ZCode 中直接提出开发需求即可触发，例如：
+在 Cursor / Codex 中直接提出开发需求即可触发，例如：
 
 ```
 @docs/travel.md 实现差旅审批

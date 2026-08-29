@@ -1,1 +1,0 @@
-skills/lean-coding-workflow/SKILL.md

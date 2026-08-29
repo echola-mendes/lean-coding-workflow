@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lean Coding Workflow"
+  short_description: "Minimal-context coding with one-step execution"
+  default_prompt: "使用 Lean Coding Workflow 执行开发任务，遵循 on-demand context、one-step-at-a-time、minimal verification 的原则"

@@ -3,6 +3,8 @@
 读取时机：Phase 0 创建基础文件、Phase 4 同步与清理、Phase 5 回退，
 或对任何文件的职责边界有疑问时。
 
+何时创建哪个文件：以 SKILL.md 各 Phase 动作为准，本文件不重复。
+
 ## 职责速查
 
 | 文件 | 职责 | 生命周期 |
@@ -10,11 +12,11 @@
 | PRD.md | 项目当前最终需求状态 | Permanent |
 | @xxx.md / PRD-Vx.md | 用户指定的需求来源 | Permanent |
 | AGENTS.md | AI Coding 行为规范 | Permanent |
-| artifacts/architecture.md | 长期架构约束 | Permanent（内容长期有效） |
-| artifacts/prd-sub.md | 当前子需求 | Temporary（清空不删除） |
-| artifacts/plan.md | 当前子需求整体方案 | Temporary（清空不删除） |
-| artifacts/execution-plan.md | 剩余待执行 Step | Temporary（清空不删除） |
-| artifacts/memory.md | 当前子需求执行记忆 | Temporary（清空不删除） |
+| artifacts/architecture.md | 长期架构约束 | Permanent |
+| artifacts/prd-sub.md | 当前子需求 | Temporary（完成后清空不删除） |
+| artifacts/plan.md | 当前子需求整体方案 | Temporary（完成后清空不删除） |
+| artifacts/execution-plan.md | 剩余待执行 Step | Temporary（完成后清空不删除） |
+| artifacts/memory.md | 当前子需求执行记忆 | Temporary（完成后清空不删除） |
 
 禁止让多个文档承担相同职责。
 
@@ -84,8 +86,8 @@
 
 ## 子需求完成清理规则（Phase 4）
 
-1. 清空 prd-sub.md / plan.md / execution-plan.md / memory.md 的内容。
-2. "清空而不是删除"：文件必须继续存在，固定文件结构保持稳定。
+1. 清空本轮已存在的 prd-sub.md / plan.md / execution-plan.md / memory.md；未存在的不要补建。
+2. "清空而不是删除"：已有文件必须继续存在。
 3. 只保留极简状态指针（格式见 file-formats.md），不要把历史写回来。
 4. 历史溯源通过三层保证，不依赖临时文件：
    - PRD.md 记录最终需求结果；

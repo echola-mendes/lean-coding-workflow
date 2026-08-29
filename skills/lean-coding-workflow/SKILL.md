@@ -28,8 +28,13 @@ description: "Document-driven coding workflow with on-demand context, one-step e
 - 用户要求继续执行未完成的 execution-plan.md → Phase 3
 - 用户报告 Bug、询问历史实现原因、要求回退/恢复 → Phase 5
 
-**会话恢复判定**：用户说"继续"时，只读取 `artifacts/execution-plan.md`（它只含剩余 Step，很小）
-即可判断当前进度，再进入对应 Phase。禁止为了恢复状态读取全部文档。
+**会话恢复判定**：用户说"继续"时，按**文件是否存在**判断进度，只读判定所需的那一个文件。禁止为了恢复状态读取全部文档。
+
+| 判定 | 进入 |
+|---|---|
+| `artifacts/execution-plan.md` 存在且含未完成 Step | Phase 3（若尚未过确认点②，先停在确认点②） |
+| `artifacts/prd-sub.md` 存在，`plan.md` / `execution-plan.md` 不存在 | 停在确认点①，或用户确认后进入 Phase 2 |
+| 上述临时文件均不存在 | Phase 0（缺 AGENTS.md / PRD.md / artifacts/）或 Phase 1 |
 
 ## 2. 项目目录约定
 
@@ -52,7 +57,7 @@ description: "Document-driven coding workflow with on-demand context, one-step e
 - 不要要求文件必须叫 PRD-Vx.md；不要自动搜索并读取所有 PRD-Vx.md。
 - 用户未指定文档时，以当前对话为需求来源；PRD.md 只在必要时按需使用。
 
-生命周期：临时文件在子需求完成后**清空内容、绝不删除文件**。
+临时文件：子需求完成后**清空内容、绝不删除**。何时创建由各 Phase 动作决定，此处不重复。
 
 **参考文件（按需读取，不要现在读）**：
 
@@ -80,10 +85,12 @@ Phase 4 子需求完成
 ### Phase 0：项目初始化
 
 - 进入：项目首次使用本 Skill，或用户明确要求初始化工作流。
-- 读取：项目目录结构；仅**检查** AGENTS.md / PRD.md / artifacts/ 是否存在，不读内容。
-- 动作：创建缺失的 AGENTS.md、PRD.md、artifacts/ 及五个工作文件（空骨架）；已存在的**禁止覆盖**。
+- 读取：项目目录结构；仅**检查** AGENTS.md / PRD.md / `artifacts/` 目录是否存在，不读内容。
+- 动作：创建缺失的 AGENTS.md、PRD.md、`artifacts/` 目录；已存在的**禁止覆盖**。
+  新建 AGENTS.md / PRD.md 只写标题（`# AGENTS` / `# PRD`）。
+  **禁止**预创建 `artifacts/` 下任何工作文件；若已有仅含占位文案的工作文件，删除之。
 - 禁止：业务需求分析、生成子需求/Plan/Execution Plan、编码、运行测试、扫描源码目录。
-- 退出：Workflow 所需基础文件齐备。
+- 退出：AGENTS.md、PRD.md、`artifacts/` 目录齐备。
 
 ### Phase 1：需求分析
 
@@ -91,9 +98,9 @@ Phase 4 子需求完成
 - 必须读取：用户当前对话 + 用户 @ 指定的需求文档 + AGENTS.md。
 - 按需读取：artifacts/architecture.md、相关源码（仅当缺少该信息会阻碍需求正确分析时）。
 - 默认禁止读取：PRD.md、其他需求文档、plan.md、execution-plan.md、memory.md。
-- 动作：生成 `artifacts/prd-sub.md` — AI 梳理后的**可执行子需求**，不是需求文档的复制；
+- 动作：写入 `artifacts/prd-sub.md` — AI 梳理后的**可执行子需求**，不是需求文档的复制；
   不添加用户没要求且无依据的业务规则；信息不足时列入"待确认问题"。
-- 禁止：编码、修改业务源码、生成 plan / execution-plan、修改 architecture.md、执行测试。
+- 禁止：编码、修改业务源码、写入 plan / execution-plan / memory / architecture、执行测试。
 - 退出：prd-sub.md 生成且用户确认。
 
 **【用户确认点①】** 生成 prd-sub.md 后必须暂停，向用户展示：需求理解 / 功能范围 / 非目标 /
@@ -106,16 +113,17 @@ Phase 4 子需求完成
 - 按需读取：artifacts/architecture.md、相关源码、artifacts/memory.md
   （仅当本子需求此前已有执行记录，或历史执行信息会影响当前方案时）。
 - 默认禁止读取：原始需求文档、PRD-Vx.md、PRD.md、整个源码目录。
-- 动作 1：生成 `artifacts/plan.md` — **跨 Step 方案决策记录**：只记横跨多个 Step 的决策与理由
+- 动作 1：写入 `artifacts/plan.md` — **跨 Step 方案决策记录**：只记横跨多个 Step 的决策与理由
   （技术方案选型、数据模型、API 契约、模块划分、依赖、风险、整体验证策略），
   不复述 Step 级实现细节（那属于 execution-plan.md），保持短（建议 ≤100 行）。
-- 动作 2：生成 `artifacts/execution-plan.md` — Step 队列，**只含未完成工作**。
+- 动作 2：写入 `artifacts/execution-plan.md` — Step 队列，**只含未完成工作**。
   每个 Step 必须：目标 / 范围 / 涉及文件 / 实现方式 / 验证方式 / 完成标准明确；
   独立可执行、可验证、可恢复、不依赖完整历史上下文；不过度细碎。
 - 动作 3：若本次做出**长期性技术选型**（新项目首次定栈、更换存储 / 框架等），
   立即写入 artifacts/architecture.md 的技术选型部分（不等 Phase 4）；
   Phase 2 对 architecture.md 的写入仅限长期技术选型，其余架构内容仍按 Phase 4 判断。
   编码层面的栈约束（框架版本、目录约定、测试规则）同步 AGENTS.md。
+  无长期选型则不写 architecture.md。
 - 禁止：修改业务源码、执行任何 Step、提前标记 DONE、写执行结果到 memory.md、修改 PRD.md。
 - 退出：plan.md + execution-plan.md 生成且用户确认。
 
@@ -194,8 +202,8 @@ architecture.md 仅当 Step 涉及新模块、模块边界、目录结构、技�
    NO 不更新；YES 才更新（判断标准见 document-contracts.md）。Phase 2 已写入的长期选型不重复写入。
 4. **提炼 memory.md**：只提炼长期价值信息（重要技术 / 架构决策、可复现问题与解决方案），
    同步到 PRD.md / architecture.md / 项目已有长期文档。**禁止新建任何长期记忆文件。**
-5. **清空临时文档**：清空 prd-sub.md / plan.md / execution-plan.md / memory.md 的内容，
-   保留极简状态指针（格式见 file-formats.md）。**清空而不是删除，文件必须继续存在。**
+5. **清空临时文档**：对本轮已存在的 prd-sub.md / plan.md / execution-plan.md / memory.md
+   清空内容、保留极简状态指针（格式见 file-formats.md）。**清空而不是删除**；未存在的文件不要补建。
 
 退出：临时文档已清空、PRD.md 已同步 → 等待下一个子需求。
 

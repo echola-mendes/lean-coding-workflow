@@ -81,6 +81,8 @@ lean-coding-workflow/
 ├── skills/
 │   └── lean-coding-workflow/
 │       ├── SKILL.md                # 核心执行规则
+│       ├── agents/
+│       │   └── openai.yaml         # skill-creator UI 元数据（列表展示名 / chips / 默认 prompt）
 │       └── references/
 │           ├── file-formats.md     # prd-sub / plan / execution-plan / memory 格式模板
 │           └── document-contracts.md
@@ -89,6 +91,7 @@ lean-coding-workflow/
 └── README.md
 ```
 
+`agents/openai.yaml` 遵循 skill-creator 推荐约定，供 Skill 列表与 chips 展示使用，不参与工作流执行逻辑。
 ## 使用
 
 在 Codex /Cursor  中直接提出开发需求即可触发，例如：
@@ -113,7 +116,7 @@ Skill 必须通过 `/lean-coding-workflow` 显式调用。
 
 | Phase | 需求文档(@xxx.md / PRD-Vx) | PRD.md | AGENTS.md | architecture.md | prd-sub.md | plan.md | execution-plan.md | memory.md | 源码 |
 |---|---|---|---|---|---|---|---|---|---|
-| Phase 0 初始化（仅检查存在性） | ❌ | ⚠️ | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Phase 0 初始化（仅检查存在性） | ❌ | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Phase 1 需求分析 | ✅（用户 @ 指定） | ⚠️（仅当用户未指定文档时按需） | ✅ | ⚠️ | ❌（本阶段生成） | ❌ | ❌ | ❌ | ⚠️ |
 | Phase 2 方案规划 | ❌ | ❌ | ✅ | ⚠️（长期选型可写入） | ✅ | ❌（本阶段生成） | ❌（本阶段生成） | ⚠️ | ⚠️ |
 | Phase 3 Step 执行 | ❌ | ❌ | ✅ | ⚠️ | ❌ | ❌ | ✅ | ❌ | ✅ |

@@ -1,7 +1,7 @@
 # File Formats — Workflow 文件格式模板
 
 读取时机：Phase 1 生成 prd-sub.md、Phase 2 生成 plan.md / execution-plan.md、
-Phase 3 写 memory.md、Phase 4 清空临时文档之前。
+Phase 3 更新 Step 状态与写 memory.md、Phase 4 清空临时文档与沉淀长期文件之前。
 
 ## artifacts/prd-sub.md（Phase 1 生成）
 
@@ -25,7 +25,7 @@ Phase 3 写 memory.md、Phase 4 清空临时文档之前。
 - 不添加用户没有要求且没有依据的业务规则。
 - 信息不足时明确列入"待确认问题"，不要自行臆测补全。
 
-## artifacts/plan.md（Phase 2 生成）
+## artifacts/plan.md（Phase 2 按需生成：存在跨 Step 决策才创建，无则不建文件）
 
 ```markdown
 # Plan
@@ -48,10 +48,12 @@ Phase 3 写 memory.md、Phase 4 清空临时文档之前。
 
 ## artifacts/execution-plan.md（Phase 2 生成）
 
-```markdown
-# Execution Plan
+当前子需求的**全部 Step 队列**（完成后 Phase 4 整体清空）。每个 Step 固定结构：
 
+```markdown
 ## Step 1：<标题>
+
+状态：PENDING
 
 ### 目标
 <这个 Step 要达成什么>
@@ -71,10 +73,9 @@ Phase 3 写 memory.md、Phase 4 清空临时文档之前。
 ### 依赖
 <仅存在依赖时保留此节>
 
----
-
-## Step 2：<标题>
-（同上结构）
+### 进度 / 下一动作
+进度：<检查点字段，开始执行后填写，见下方"状态与检查点">
+下一动作：<同上>
 ```
 
 要求：
@@ -82,80 +83,65 @@ Phase 3 写 memory.md、Phase 4 清空临时文档之前。
 - 每个 Step 的目标、范围、涉及文件、实现方式、验证方式、完成标准必须明确。
 - Step 独立可执行、可验证、可恢复，不依赖完整历史上下文。
 - 不过度细碎：Step 大小以"能在较小上下文中可靠完成"为准。
-- **只保存未完成 Step**：完成并验证成功即删除；失败 / BLOCKED 必须保留。
-- 它是 Future Work，不是历史记录，禁止保留 DONE / 历史 Step。
+- **保存全部 Step，不因完成删除**：整个子需求期间所有 Step 都在，凭状态行看进度；
+  Phase 4 整体清空。
+- **状态行是 Step 的唯一持久进度**：状态每次变更立即写回本文件；
+  会话中断后凭状态行 + 实际代码进度恢复。
+- DONE 的 Step 正文压缩为一行（`状态：DONE — <验证方式与结果>`），其余小节删除，控制文件体积。
 
-## artifacts/memory.md（Phase 3 每个 Step 后追加）
+### 状态与检查点
 
-Step 成功条目：
-
-```markdown
-## Step N
-
-状态：DONE
-
-完成：
-+ <做了什么>
-
-修改：
-+ <文件列表>
-
-验证：
-+ <验证方式与结果，如 xxx test PASS>
-
-决策：
-+ <重要技术决策，如：复用现有 xxx 机制>
-
-备注：
-+ <后续 Step 需要知道的信息>
+```
+PENDING → IN_PROGRESS → VERIFYING → DONE
+                      → FAILED →（修复后）VERIFYING
+无法继续 → BLOCKED
 ```
 
-Step 失败条目：
+- 状态取值：PENDING / IN_PROGRESS / VERIFYING / FAILED / BLOCKED / DONE。
+- **检查点（中断恢复用）**：在开始 Step、完成子任务、验证前后、暂停 / 请求用户输入时更新，
+  如：
+  `进度：已完成 LoginFilter 与单测`
+  `下一动作：跑集成验证，预期 401 返回结构符合契约`
+- 恢复流程见 SKILL.md Phase 3；文件记录是提示，代码是事实。
+
+## artifacts/memory.md（长期经验记忆；Phase 3 / Phase 4 追加）
+
+定位与职责边界见 document-contracts.md；本节只定写入判断与条目格式（主题式，一条一主题）：
 
 ```markdown
-## Step N
+## <主题，如"审批接口的权限过滤必须复用 AuthFilterChain">
 
-状态：FAILED
+日期：<YYYY-MM-DD>　来源：<子需求名>
 
-问题：
-+ <现象>
+问题：<背景与现象，一两行>
 
-原因：
-+ <原因分析>
-
-尝试：
-+ <已尝试的修复>
-
-下一步：
-+ <打算怎么做>
-```
-
-写入前必须判断："这条信息未来是否有助于当前子需求继续执行、问题排查、状态恢复或理解重要决策？"
-NO 不记录，YES 才记录。
-
-禁止记录：Agent 思维过程、完整源码、完整测试输出、所有命令、无意义操作、重复信息。
-
-Memory = 短、精确、高价值、可恢复。
-
-## 子需求完成后的清空格式（Phase 4）
-
-四个临时文件（prd-sub.md / plan.md / execution-plan.md / memory.md）清空为极简状态：
-
-```markdown
-# Current Workflow State
-
-状态：IDLE
-
-上一个子需求：<名称>
-
-完成时间：<日期>
-
-结果：已完成并同步至 PRD.md
-
-架构：architecture.md 已更新 / 无架构变化
+解法：<为什么这么做、怎么复用>
 ```
 
 要求：
 
-- **清空而不是删除**：已有文件必须继续存在；未存在的不要补建。
-- 状态信息必须非常短，禁止把整个历史重新写回来。
+- 写入前判断："这条信息未来是否有助于后续子需求、问题排查或理解重要决策？
+  且是否属于架构（→ architecture.md）、编码规则（→ AGENTS.md）、需求结果（→ PRD.md）之外的经验？"
+  NO 不记录，YES 才记录。
+- 禁止记录：Agent 思维过程、完整源码、完整测试输出、命令流水、执行历史、重复信息。
+- 容量目标 ≤200 行：超过时优先压缩冗长条目、合并重复条目、淘汰低价值历史，
+  **不得简单截断**（截断会无声丢失条目）。
+
+Memory = 短、精确、高价值、可检索。
+
+## 子需求完成后的清空格式（Phase 4）
+
+prd-sub.md / plan.md / execution-plan.md 三个临时文件清空内容、保留文件，只留一行职责标题
+（每个文件只写对应的那一行）：
+
+```markdown
+# prd-sub — 当前子需求（完成后清空）
+# plan — 当前子需求跨 Step 方案决策（完成后清空）
+# execution-plan — 当前子需求 Step 队列与状态（完成后清空）
+```
+
+要求：
+
+- **清空而不是删除**：文件必须继续存在；未创建过的文件不补建。
+- 三行内容各不相同，禁止写入 IDLE / 状态指针类重复内容。
+- memory.md 是长期文件，**不清空**；architecture.md 按 Phase 4 判断更新。

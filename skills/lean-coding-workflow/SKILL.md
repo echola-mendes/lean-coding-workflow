@@ -21,10 +21,11 @@ description: "Document-driven coding workflow with on-demand context, one-step e
 
 ## 2. 文件
 
-`AGENTS.md`（必读，缺失视为无附加规则）/ `PRD.md`（可选）在项目根；
+约定文件 `AGENTS.md`（必读；缺失时回退 `CLAUDE.md`，两者都缺视为无附加规则）与 `PRD.md`（可选）在项目根；
 workflow 文件在 `artifacts/`：architecture / prd-sub / execution-plan / memory。
 职责与生命周期以 `references/document-contracts.md` 为准。铁律：prd-sub 与 execution-plan
-完成后清空内容、保留文件；memory 长期不清空；用户需求文档只读，永不修改。
+保留至下一子需求启动，Phase 1 总结进 memory 后清空（清空内容、保留文件）；memory 长期不清空；
+用户需求文档只读，永不修改。
 需求入口：用户 @ 的任意 .md = 当前需求来源（不限命名与路径，禁止自动搜索其他需求文档）；
 未指定则以当前对话为来源。
 
@@ -43,8 +44,10 @@ Phase 1 需求分析 →【确认①】→ Phase 2 方案规划 →【确认②�
 
 ### Phase 1：需求分析
 
-- 读：当前对话 + 用户 @ 的需求文档 + AGENTS.md（缺失视为无附加规则）；按需 architecture / 相关源码。
-- 若 execution-plan.md 含非 `[✅]` 验收项（上一子需求未完）：暂停请用户决定——先完成，或放弃（清空旧临时文件）。
+- 读：当前对话 + 用户 @ 的需求文档 + 约定文件（§2，缺失视为无附加规则）；按需 architecture / 相关源码。
+- 存在旧 prd-sub / execution-plan（上一子需求）→ 先收尾再开新：总结为 memory.md 完成记录表一行
+  （名称 / 日期 / 结果一句话 / 验收 x/y `[✅]`，未完成与 `[❌]` `[⚠️]` 项如实标注），
+  清空两文件（只留一行职责标题），并将 memory.md 压缩整理至 <300 行（格式见 file-formats.md）。
 - 写 `artifacts/prd-sub.md`（目录不存在则创建）：AI 梳理后的可执行子需求，不是需求复制；
   不添加无依据的业务规则；信息不足列入"待确认问题"。
 - 禁止：编码、改业务源码、写其他 workflow 文件、改用户需求文档。
@@ -52,13 +55,13 @@ Phase 1 需求分析 →【确认①】→ Phase 2 方案规划 →【确认②�
 
 ### Phase 2：方案规划
 
-- 读：prd-sub.md + AGENTS.md；按需 architecture / 相关源码 / memory 经验条目。
+- 读：prd-sub.md + 约定文件（§2）；按需 architecture / 相关源码 / memory 经验条目。
 - 写 `artifacts/execution-plan.md`：全部 Step，每个 Step 三节——目标 / 方案 / 验收（`- [ ]` 清单项）。
   验收与修改范围匹配：类型改动用 type check，局部逻辑用单测，对外契约用契约测试，
   持久化用 schema 检查，UI 用路径验证，跨模块按风险扩大到调用方。格式见 file-formats.md。
 - 按判断标准（document-contracts.md）写 architecture.md：新项目首次结构性决策必须产出架构设计并写入；
   已有项目仅存在长期架构变化时更新。
-- 编码栈约束属 AGENTS.md：存在则同步；不存在先记 execution-plan.md 头部，Phase 4 转入。
+- 编码栈约束属约定文件（§2）：存在则同步；不存在先记 execution-plan.md 头部，Phase 4 转入。
 - 禁止：改业务源码、执行 Step、写 memory、改 PRD.md。
 - **【确认②】** 展示：技术方案 / Step 划分与依赖 / 验收方式；确认后 → Phase 3。
 
@@ -66,7 +69,7 @@ Phase 1 需求分析 →【确认①】→ Phase 2 方案规划 →【确认②�
 
 按 execution-plan.md 顺序执行，一次一个 Step：
 
-1. 读 execution-plan.md + AGENTS.md → 第一个存在非 `[✅]` 验收项的 Step = 当前 Step；
+1. 读 execution-plan.md + 约定文件（§2）→ 第一个存在非 `[✅]` 验收项的 Step = 当前 Step；
    读取相关源码并实现。禁止实现后续 Step、改无关模块；允许必需的最小依赖修改。
 2. 执行该 Step 的验收：通过 → `[ ]` 改 `[✅]`；该 Step 全部 `[✅]` 后进入下一 Step。
 3. 验收失败 → 标 `[❌]`，分析原因：当前 Step 的问题改当前 Step；前置 Step 引起的问题回到该
@@ -80,9 +83,11 @@ Phase 1 需求分析 →【确认①】→ Phase 2 方案规划 →【确认②�
 
 1. PRD.md 存在则同步本次需求结果（不存在不创建）。
 2. architecture.md 仅在存在架构变化时创建或更新（判断标准见 document-contracts.md）。
-3. memory.md 只追加值得长期保留的经验（格式与容量规则见 file-formats.md）；它是唯一记忆文件。
-4. 清空 prd-sub.md 与 execution-plan.md：清空内容、保留文件、只留一行职责标题；未创建不补建。
-5. 向用户报告结果与各文件处理情况。
+3. 约定文件缺失时按本轮实际执行的约定创建（AGENTS.md；已有 CLAUDE.md 且无 AGENTS.md 则追加其中），
+   创建前告知用户。
+4. memory.md 只追加值得长期保留的经验（格式与容量规则见 file-formats.md）；它是唯一记忆文件。
+5. 临时文件保留不动——prd-sub.md 与 execution-plan.md 留存至下一子需求启动时总结并清空。
+6. 向用户报告结果与各文件处理情况。
 
 ## 4. Context-on-Demand
 

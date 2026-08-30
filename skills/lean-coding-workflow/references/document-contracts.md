@@ -11,10 +11,10 @@
 |---|---|---|
 | PRD.md | 项目当前最终需求状态 | Permanent（可选：存在才在 Phase 4 同步） |
 | @xxx.md / PRD-Vx.md | 用户指定的需求来源 | Permanent（用户所有，只读） |
-| AGENTS.md | AI Coding 行为规范 | Permanent（必读，缺失视为无附加规则；缺失时 Phase 4 按实际约定创建） |
+| AGENTS.md | AI Coding 行为规范（约定文件；Claude Code 回退 CLAUDE.md） | Permanent（必读；缺失时 Phase 4 按实际约定创建） |
 | artifacts/architecture.md | 长期架构约束 | Permanent（有长期架构变化时创建 / 更新） |
-| artifacts/prd-sub.md | 当前子需求 | Temporary（完成后清空内容） |
-| artifacts/execution-plan.md | 当前子需求全部 Step 与验收勾选 | Temporary（完成后清空内容） |
+| artifacts/prd-sub.md | 当前子需求 | Temporary（保留至下一子需求启动：总结后清空） |
+| artifacts/execution-plan.md | 当前子需求全部 Step 与验收勾选 | Temporary（保留至下一子需求启动：总结后清空） |
 | artifacts/memory.md | 项目长期经验记忆 | Permanent（不清空；禁止流水；必要时压缩） |
 
 禁止让多个文档承担相同职责。
@@ -36,12 +36,15 @@
 - Phase 1 用户指定时必读；Phase 2 / Phase 3 默认禁止重读（除非当前任务确实无法完成）。
 - 禁止自动搜索并读取所有 PRD-Vx.md。
 
-### AGENTS.md
+### AGENTS.md — 约定文件
 
 - 职责：技术栈、编码规范、命名规范、项目约定、测试规则、AI 修改代码必须遵守的规则、开发限制。
 - **必读**：Phase 1 / 2 / 3 每次读取；缺失视为无附加规则，不阻塞执行、不臆造规则。
-- 创建：项目缺失时，Phase 4 依据本轮**实际执行中采用的约定**创建（测试命令、命名、目录、
-  框架版本等），创建前告知用户；新项目的栈约束在 Phase 2 先记录于 execution-plan.md 头部。
+- **宿主回退**：项目无 AGENTS.md 而 CLAUDE.md 存在（Claude Code 项目）→ 读 CLAUDE.md，等同约定文件；
+  两者都缺视为无附加规则。
+- 创建：缺失时 Phase 4 依据本轮**实际执行中采用的约定**创建（测试命令、命名、目录、
+  框架版本等），创建前告知用户；已有 CLAUDE.md 且无 AGENTS.md → 追加进 CLAUDE.md
+  （宿主可自动加载），禁止覆盖；新项目的栈约束在 Phase 2 先记录于 execution-plan.md 头部。
 - 已存在时禁止覆盖，只追加 / 修正。
 
 ### artifacts/architecture.md
@@ -52,7 +55,7 @@
   - NO → 不创建 / 不更新。
   - YES → 创建 / 更新。
 - 例外：Phase 2 做出长期性技术选型时立即写入（不等 Phase 4）；
-  **新项目（无 AGENTS.md、无 architecture.md）首次做结构性决策时，Phase 2 必须产出架构设计并写入**。
+  **新项目（无约定文件 AGENTS/CLAUDE.md、无 architecture.md）首次做结构性决策时，Phase 2 必须产出架构设计并写入**。
   除上述两类，Phase 2 不写本文件，其余架构内容仍按 Phase 4 判断。
 - 需要更新的例子：整体目录结构变化、新增长期模块边界、新增接口架构规范、
   新增统一技术组件、技术栈变化、数据存储架构变化、Agent / Tool 架构变化、新增长期开发规则。
@@ -62,7 +65,7 @@
 
 ### artifacts/prd-sub.md — 当前子需求
 
-- 临时，只服务当前子需求；完成后清空内容、只留一行职责标题、禁止删除文件。
+- 临时，只服务当前子需求；保留至下一子需求启动——总结进 memory 后清空（只留一行职责标题），禁止删除文件。
 - 是 AI 梳理后的需求，不是需求文档的复制。
 
 ### artifacts/execution-plan.md — 当前子需求全部 Step 与验收（唯一计划文件）
@@ -71,14 +74,15 @@
 - **验收勾选是唯一执行状态**：`[ ]` 未验收 / `[✅]` 通过 / `[❌]` 验收失败 / `[⚠️]` 受阻；
   全部 `[✅]` = 子需求完成；不记录其他状态、进度或 checkpoint；
   中断后从第一个非 `[✅]` Step 继续，无独立恢复流程。
-- 完成后清空内容、只留一行职责标题、禁止删除文件；长期经验进 memory.md。
+- 保留至下一子需求启动：Phase 1 总结进 memory 后清空（只留一行职责标题），禁止删除文件；长期经验进 memory.md。
 
 ### artifacts/memory.md — 项目长期经验记忆
 
-- **Permanent，不清空**：项目级长期经验——踩坑与解法、"为什么这么做"的决策理由、可复现问题；
-  不是执行流水（那随 execution-plan 清空），只收 PRD / architecture / AGENTS 放不下的经验。
-- Phase 4 沉淀：只记录值得长期保留的经验（分流规则见 SKILL.md Phase 4）。
-- 容量目标 ≤200 行（压缩规则见 file-formats.md）。
+- **Permanent，不清空**：项目级长期记忆——完成记录表（一行一子需求）+ 经验条目（踩坑与解法、
+  "为什么这么做"的决策理由、可复现问题）；只收 PRD / architecture / AGENTS 放不下的内容。
+- 写入时机：经验条目 Phase 4 沉淀（分流规则见 SKILL.md Phase 4）；
+  完成记录行 + 全文压缩整理在 Phase 1（下一子需求启动、清空旧临时文件之前）。
+- 容量：全文 <300 行（压缩规则见 file-formats.md）。
 
 ## 子需求完成清理规则（Phase 4）
 

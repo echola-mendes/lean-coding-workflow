@@ -1,6 +1,7 @@
 # File Formats — Workflow 文件格式模板
 
-读取时机：Phase 1 生成 prd-sub.md、Phase 2 生成 execution-plan.md、Phase 4 清空与沉淀之前。
+读取时机：Phase 1 生成 prd-sub.md 与收尾上一子需求、Phase 2 生成 execution-plan.md、
+Phase 4 沉淀经验之前。
 
 ## artifacts/prd-sub.md（Phase 1 生成）
 
@@ -57,11 +58,23 @@
 - 验收项与修改范围匹配：类型 / 结构改动用 type check，局部逻辑用单测，对外契约用契约测试，
   持久化 / schema 用 schema 检查，UI 用路径验证，跨模块 / 破坏性契约按风险扩大到调用方。
 - Step 独立可执行、可验收，不依赖完整历史上下文；不过度细碎，以"较小上下文能可靠完成"为准。
-- 新项目（无 AGENTS.md）的编码层栈约束记录在文件头部，Phase 4 创建 AGENTS.md 时转入。
+- 新项目（无约定文件 AGENTS/CLAUDE.md）的编码层栈约束记录在文件头部，Phase 4 创建约定文件时转入。
 
-## artifacts/memory.md（Phase 4 沉淀）
+## artifacts/memory.md（项目长期记忆）
 
-定位与职责边界见 document-contracts.md；本节只定写入判断与条目格式（主题式，一条一主题）：
+定位与职责边界见 document-contracts.md。结构两层：
+
+**完成记录表**（一行一子需求；Phase 1 启动新子需求时追加）：
+
+```markdown
+## 完成记录
+
+| 子需求 | 日期 | 结果 | 验收 |
+|---|---|---|---|
+| <名称> | <YYYY-MM-DD> | <一句话做了什么> | x/y [✅] |
+```
+
+**经验条目**（主题式，一条一主题；Phase 4 沉淀）：
 
 ```markdown
 ## <主题，如"审批接口的权限过滤必须复用 AuthFilterChain">
@@ -75,25 +88,26 @@
 
 要求：
 
-- 写入前判断："这条信息未来是否有助于后续子需求、问题排查或理解重要决策？
+- 经验写入前判断："这条信息未来是否有助于后续子需求、问题排查或理解重要决策？
   且是否属于架构（→ architecture.md）、编码规则（→ AGENTS.md）、需求结果（→ PRD.md）之外的经验？"
   NO 不记录，YES 才记录。
-- 禁止记录：Agent 思维过程、完整源码、完整测试输出、命令流水、执行历史、重复信息。
-- 容量目标 ≤200 行：超过时优先压缩冗长条目、合并重复条目、淘汰低价值历史，
+- 禁止记录：Agent 思维过程、完整源码、完整测试输出、命令流水、按 Step 展开的执行流水、重复信息。
+- 容量：全文 <300 行。Phase 1 追加完成记录后顺手压缩整理——合并重复、淘汰低价值条目，
   **不得简单截断**（截断会无声丢失条目）。
 
 Memory = 短、精确、高价值、可检索。
 
-## 子需求完成后的清空格式（Phase 4）
+## 下一子需求启动时的清空格式（Phase 1）
 
-prd-sub.md / execution-plan.md 清空内容、保留文件，只留一行职责标题（每个文件只写对应的那一行）：
+存在旧 prd-sub.md / execution-plan.md 时：先总结（完成记录表一行，见 memory.md 节），
+再清空两文件——清空内容、保留文件，只留一行职责标题（每个文件只写对应的那一行）：
 
 ```markdown
-# prd-sub — 当前子需求（完成后清空）
-# execution-plan — 当前子需求 Step 与验收（完成后清空）
+# prd-sub — 当前子需求（下一子需求启动时清空）
+# execution-plan — 当前子需求 Step 与验收（下一子需求启动时清空）
 ```
 
 要求：
 
 - **清空而不是删除**：文件必须继续存在；未创建过的文件不补建。
-- memory.md 是长期文件，**不清空**；architecture.md 按 Phase 4 判断更新。
+- memory.md 是长期文件，**不清空**；architecture.md 按判断更新。

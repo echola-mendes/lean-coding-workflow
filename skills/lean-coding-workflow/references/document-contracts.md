@@ -13,8 +13,8 @@
 | @xxx.md / PRD-Vx.md | 用户指定的需求来源 | Permanent（用户所有，只读） |
 | AGENTS.md | AI Coding 行为规范（约定文件；Claude Code 回退 CLAUDE.md） | Permanent（必读；缺失时 Phase 4 按实际约定创建） |
 | artifacts/architecture.md | 长期架构约束 | Permanent（有长期架构变化时创建 / 更新） |
-| artifacts/prd-sub.md | 当前子需求 | Temporary（保留至下一子需求启动：总结后清空） |
-| artifacts/execution-plan.md | 当前子需求全部 Step 与验收勾选 | Temporary（保留至下一子需求启动：总结后清空） |
+| artifacts/prd-sub.md | 当前子需求 | Temporary（Phase 4 归档后保留；Phase 1 启动核对后清空） |
+| artifacts/execution-plan.md | 当前子需求全部 Step 与验收勾选 | Temporary（Phase 4 归档后保留；Phase 1 启动核对后清空） |
 | artifacts/memory.md | 项目长期经验记忆 | Permanent（不清空；禁止流水；必要时压缩） |
 
 禁止让多个文档承担相同职责。
@@ -65,24 +65,21 @@
 
 ### artifacts/prd-sub.md — 当前子需求
 
-- 临时，只服务当前子需求；保留至下一子需求启动——总结进 memory 后清空（只留一行职责标题），禁止删除文件。
+- 临时，只服务当前子需求（生命周期见 SKILL.md §2），禁止删除文件。
 - 是 AI 梳理后的需求，不是需求文档的复制。
 
 ### artifacts/execution-plan.md — 当前子需求全部 Step 与验收（唯一计划文件）
 
 - Phase 2 生成：全部 Step，每个 Step 三节（目标 / 方案 / 验收，格式见 file-formats.md）。
-- **验收勾选是唯一执行状态**：`[ ]` 未验收 / `[✅]` 通过 / `[❌]` 验收失败 / `[⚠️]` 受阻；
-  全部 `[✅]` = 子需求完成；不记录其他状态、进度或 checkpoint；
-  中断后从第一个非 `[✅]` Step 继续，无独立恢复流程。
-- 保留至下一子需求启动：Phase 1 总结进 memory 后清空（只留一行职责标题），禁止删除文件；长期经验进 memory.md。
+- 验收勾选即唯一执行状态（四态定义与执行规则见 file-formats.md）；无独立恢复流程。
+- 生命周期（归档 / 清空）见 SKILL.md §2；长期经验进 memory.md。
 
 ### artifacts/memory.md — 项目长期经验记忆
 
 - **Permanent，不清空**：项目级长期记忆——完成记录表（一行一子需求）+ 经验条目（踩坑与解法、
-  "为什么这么做"的决策理由、可复现问题）；只收 PRD / architecture / AGENTS 放不下的内容。
-- 写入时机：经验条目 Phase 4 沉淀（分流规则见 SKILL.md Phase 4）；
-  完成记录行 + 全文压缩整理在 Phase 1（下一子需求启动、清空旧临时文件之前）。
-- 容量：全文 <300 行（压缩规则见 file-formats.md）。
+  "为什么这么做"的决策理由、可复现问题）；只收 PRD / architecture / AGENTS 放不下的内容；
+  不记录执行流水。
+- 容量：全文 <300 行（结构、写入时机与压缩规则见 file-formats.md）。
 
 ## 子需求完成清理规则（Phase 4）
 

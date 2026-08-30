@@ -1,6 +1,6 @@
 # Document Contracts — 文件职责 / 生命周期 / 更新规则
 
-读取时机：Phase 0 检查、Phase 2 架构写入判断、Phase 4 同步与清理，
+读取时机：Phase 2 架构写入判断、Phase 4 同步与清理，
 或对任何文件的职责边界有疑问时读取。
 
 何时创建哪个文件：以 SKILL.md 各 Phase 动作为准，本文件不重复。
@@ -11,11 +11,11 @@
 |---|---|---|
 | PRD.md | 项目当前最终需求状态 | Permanent（可选：存在才在 Phase 4 同步） |
 | @xxx.md / PRD-Vx.md | 用户指定的需求来源 | Permanent（用户所有，只读） |
-| AGENTS.md | AI Coding 行为规范 | Permanent（可选：存在才读；缺失时 Phase 4 按实际约定创建） |
+| AGENTS.md | AI Coding 行为规范 | Permanent（必读，缺失视为无附加规则；缺失时 Phase 4 按实际约定创建） |
 | artifacts/architecture.md | 长期架构约束 | Permanent（有长期架构变化时创建 / 更新） |
 | artifacts/prd-sub.md | 当前子需求 | Temporary（完成后清空内容） |
-| artifacts/plan.md | 当前子需求整体方案 | Temporary（完成后清空内容） |
-| artifacts/execution-plan.md | 当前子需求全部 Step 及状态行 | Temporary（完成后清空内容） |
+| artifacts/plan.md | 当前子需求整体方案 | Temporary（按需创建；完成后清空内容） |
+| artifacts/execution-plan.md | 当前子需求全部 Step 及状态行 + 验收清单 | Temporary（完成后清空内容） |
 | artifacts/memory.md | 项目长期经验记忆 | Permanent（不清空；禁止流水；必要时压缩） |
 
 禁止让多个文档承担相同职责。
@@ -40,7 +40,7 @@
 ### AGENTS.md
 
 - 职责：技术栈、编码规范、命名规范、项目约定、测试规则、AI 修改代码必须遵守的规则、开发限制。
-- **可选文件**：Phase 1 / 2 / 3 存在则必读；不存在不阻塞执行、不臆造规则。
+- **必读**：Phase 1 / 2 / 3 每次读取；缺失视为无附加规则，不阻塞执行、不臆造规则。
 - 创建：项目缺失时，Phase 4 依据本轮**实际执行中采用的约定**创建（测试命令、命名、目录、
   框架版本等），创建前告知用户；新项目的栈约束在 Phase 2 先记录于 plan.md。
 - 已存在时禁止覆盖，只追加 / 修正。
@@ -74,10 +74,11 @@
 - 新项目（无 AGENTS.md）的编码层栈约束在此过渡记录，Phase 4 创建 AGENTS.md 时转入。
 - 完成后清空内容、只留一行职责标题、禁止删除文件。
 
-### artifacts/execution-plan.md — 当前子需求全部 Step（含状态）
+### artifacts/execution-plan.md — 当前子需求全部 Step（含状态）+ 验收清单
 
-- Phase 2 生成，包含本次子需求的**全部 Step**，每个 Step 带状态行与检查点
-  （状态机与格式见 file-formats.md）；状态每次变更立即写回，它是 Step 进度的唯一持久载体。
+- Phase 2 生成：全部 Step（每个只有 目标 / 方案 / 验证 三节，格式见 file-formats.md）
+  与文末验收清单（从 prd-sub.md 验收标准转写，Phase 4 逐项验证）。
+- 每个 Step 带状态行与检查点；状态每次变更立即写回，它是 Step 进度的唯一持久载体。
 - Step 完成 → 标 DONE、正文压缩为一行验证结果；**不删除**，Phase 4 整体清空。
 - 它不是长期历史；长期经验进 memory.md。
 
@@ -100,7 +101,7 @@ memory.md 记录长期经验与决策理由，git 历史 + 用户原始需求文
 - 新建 memory.md 之外的任何记忆文件。
 - 修改用户提供的原始需求文档（@xxx.md 只读）。
 - 在多个临时文件重复写入同一份状态指针 / IDLE 占位内容。
-- Phase 0 自动创建 AGENTS.md / PRD.md / 工作文件（仅用户明确要求时创建）。
+- 自动创建 AGENTS.md / PRD.md / 任何工作文件（仅用户明确要求时创建）。
 - 每个 Step 自动读取所有文档 / 整个 architecture.md / 整个 memory.md。
 - 每个 Step 自动运行完整测试。
 - 自动扫描整个项目源码；自动读取所有 PRD-Vx.md。

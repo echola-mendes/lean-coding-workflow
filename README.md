@@ -40,16 +40,14 @@
 ### 落地形态
 
 - **文档驱动开发**：需求 → 子需求 → 方案 → 执行计划 → 逐步执行 → 验证 → 沉淀 → 收尾。
-- **严格 Phase 状态机**：Phase 0 检查 → Phase 1 需求分析 → 确认① → Phase 2 方案规划 → 确认② → Phase 3 逐步执行 → Phase 4 子需求完成。
+- **严格 Phase 状态机**：Phase 1 需求分析 → 确认① → Phase 2 方案规划 → 确认② → Phase 3 逐步执行 → Phase 4 子需求完成。
 - **长期 / 临时两层文档**：
-  - 长期：`PRD.md`（需求状态，可选）、`AGENTS.md`（编码规则，可选）、`architecture.md`（架构约束，按需创建）、`memory.md`（长期经验）
+  - 长期：`PRD.md`（需求状态，可选）、`AGENTS.md`（编码规则，必读）、`architecture.md`（架构约束，按需创建）、`memory.md`（长期经验）
   - 临时：`prd-sub.md` / `plan.md`（按需）/ `execution-plan.md`
 
 ## 工作流
 
 ```
-Phase 0 检查（只检查不创建）
-   ↓
 Phase 1 需求分析 ──→ 【用户确认①】prd-sub.md
    ↓
 Phase 2 方案规划 ──→ 【用户确认②】execution-plan.md（plan.md 按需）
@@ -67,21 +65,16 @@ Phase 4 子需求完成（同步 PRD（若存在）/ 更新 architecture / 沉�
 project/
 ├── PRD.md                  # 长期：项目当前最终需求状态（可选：存在才同步）
 ├── PRD-V1.md …             # 长期：版本化需求（可选；也可用任意 @xxx.md 作为需求入口，只读）
-├── AGENTS.md               # 长期：AI 编码规则（可选：存在才读；缺失时 Phase 4 按实际约定创建）
+├── AGENTS.md               # 长期：AI 编码规则（必读，缺失视为无附加规则；缺失时 Phase 4 按实际约定创建）
 └── artifacts/
     ├── architecture.md     # 长期：架构约束（有长期架构变化时创建 / 更新）
     ├── prd-sub.md          # 临时：当前子需求（完成后清空）
     ├── plan.md             # 临时：跨 Step 方案决策（按需创建，完成后清空）
-    ├── execution-plan.md   # 临时：全部 Step 及状态行（完成后清空）
+    ├── execution-plan.md   # 临时：全部 Step（目标 / 方案 / 验证）+ 验收清单（完成后清空）
     └── memory.md           # 长期：项目经验记忆（不清空，禁止流水，必要时压缩）
 ```
 
-临时文件在子需求完成后**清空内容、保留文件**；`memory.md` 是唯一长期记忆文件——只沉淀经验与决策理由，禁止执行流水。长期知识分流沉淀到 `PRD.md`（若有）/ `architecture.md` / `AGENTS.md`。
-
-- `execution-plan.md` 保留全部 Step 并维护状态行（PENDING / IN_PROGRESS / VERIFYING / FAILED / BLOCKED / DONE），中断后凭状态行 + git diff 恢复。
-- `plan.md` 只记横跨多个 Step 的决策与理由，按需创建。
-- 长期性技术选型在 Phase 2 即时写入 `architecture.md`；新项目首次结构性决策必须产出架构设计。
-- 编码层栈约束（框架版本、目录约定、测试规则）进 `AGENTS.md`；项目缺失该文件时，Phase 4 按实际执行约定创建。
+各文件的职责、生命周期与创建时机详见 `skills/lean-coding-workflow/references/document-contracts.md`。
 
 ## 安装
 
@@ -156,19 +149,3 @@ lean-coding-workflow/
 ├── LICENSE
 └── README.md
 ```
-
-## Context Loading Matrix（各 Phase 读取矩阵）
-
-> 供人查阅的汇总视图；执行时的规则以 SKILL.md 各 Phase 小节为准，模型执行时无需读取本表。
-
-| Phase | 需求文档(@xxx.md / PRD-Vx) | PRD.md | AGENTS.md | architecture.md | prd-sub.md | plan.md | execution-plan.md | memory.md | 源码 |
-|---|---|---|---|---|---|---|---|---|---|
-| Phase 0 检查（只检查不创建） | ❌ | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Phase 1 需求分析 | ✅（用户 @ 指定） | ⚠️（仅当用户未指定文档时按需） | ✅（存在才读） | ⚠️ | ❌（本阶段生成） | ❌ | ❌ | ❌ | ⚠️ |
-| Phase 2 方案规划 | ❌ | ❌ | ✅（存在才读） | ⚠️（长期选型 / 新项目架构必写） | ✅ | ❌（按需生成） | ❌（本阶段生成） | ⚠️（相关经验条目） | ⚠️ |
-| Phase 3 Step 执行 | ❌ | ❌ | ✅（存在才读） | ⚠️ | ❌ | ❌ | ✅（状态实时写回） | ❌ | ✅ |
-| Phase 4 子需求完成 | ❌ | ⚠️（存在才写） | ✅（缺失时创建） | ⚠️（判断后写） | ✅（读后清空） | ✅（清空） | ✅（读最终状态后清空） | ✅（分流追加） | ⚠️ |
-
-✅ 必须读取　⚠️ 只有必要时读取（默认禁止）　❌ 默认禁止读取
-
-PRD.md / AGENTS.md 为可选文件：不存在时跳过读取与同步，不阻塞流程。

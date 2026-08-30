@@ -1,7 +1,6 @@
 # File Formats — Workflow 文件格式模板
 
-读取时机：Phase 1 生成 prd-sub.md、Phase 2 生成 plan.md / execution-plan.md、
-Phase 3 更新 Step 状态与写 memory.md、Phase 4 清空临时文档与沉淀长期文件之前。
+读取时机：Phase 1 生成 prd-sub.md、Phase 2 生成 execution-plan.md、Phase 4 清空与沉淀之前。
 
 ## artifacts/prd-sub.md（Phase 1 生成）
 
@@ -25,86 +24,42 @@ Phase 3 更新 Step 状态与写 memory.md、Phase 4 清空临时文档与沉淀
 - 不添加用户没有要求且没有依据的业务规则。
 - 信息不足时明确列入"待确认问题"，不要自行臆测补全。
 
-## artifacts/plan.md（Phase 2 按需生成：存在跨 Step 决策才创建，无则不建文件）
-
-```markdown
-# Plan
-
-## 1. 技术方案
-## 2. 模块设计
-## 3. 数据设计
-## 4. API 设计
-## 5. 核心流程
-## 6. 依赖
-## 7. 风险
-## 8. 验证策略
-```
-
-回答"这个子需求整体准备怎么实现？"——只记**跨 Step 的方案决策与理由**：
-
-- 不复述 Step 级实现细节（那属于 execution-plan.md 的每个 Step）。
-- 不复制需求原文（那属于 prd-sub.md）。
-- 保持短（建议 ≤100 行）：每节只写决策与理由，不写教程式展开。
-
 ## artifacts/execution-plan.md（Phase 2 生成）
 
-当前子需求的**全部 Step 队列 + 文末验收清单**（完成后 Phase 4 整体清空）。
-每个 Step 只有三节，固定结构：
+当前子需求的全部 Step（完成后 Phase 4 清空）。每个 Step 三节：
 
 ```markdown
+# Execution Plan
+
 ## Step 1：<标题>
 
-状态：PENDING
-
 ### 目标
-<这个 Step 要达成什么>
+<要完成什么>
 
 ### 方案
-<怎么做：涉及文件 / 模块、实现要点、必要的依赖说明，写到足够执行即可>
+<核心实现方式，含涉及文件与依赖>
 
-### 验证
-<最小必要验证，与修改范围匹配>
-```
-
-文末附验收清单（Step 全部完成后、Phase 4 逐项验证用）：
-
-```markdown
-## 验收清单
-
-- [ ] <验收项，从 prd-sub.md 验收标准转写>
+### 验收
 - [ ] <验收项>
+- [ ] <验收项>
+
+---
+
+## Step 2：<标题>
+（同上结构）
 ```
 
 要求：
 
-- 每个 Step 只有 目标 / 方案 / 验证 三节 + 一行状态，必须明确到可执行；涉及文件与依赖写在"方案"里。
-- Step 独立可执行、可验证、可恢复，不依赖完整历史上下文。
-- 不过度细碎：Step 大小以"能在较小上下文中可靠完成"为准。
-- **保存全部 Step，不因完成删除**：整个子需求期间所有 Step 都在，凭状态行看进度；
-  Phase 4 整体清空。
-- **状态行是 Step 的唯一持久进度**：状态每次变更立即写回本文件；
-  开始执行后在状态行下追加 `进度：` / `下一动作：` 两行作为检查点；
-  会话中断后凭状态行 + 实际代码进度恢复。
-- DONE 的 Step 压缩为一行（`状态：DONE — <验证结果>`），其余内容删除，控制文件体积。
-- **验收清单**：从 prd-sub.md 的验收标准转写为 `- [ ]` 可勾选清单（执行侧视图，不另立验收文档）；
-  Phase 4 逐项验证、通过后勾选，完成报告逐项对照。
+- **验收勾选是唯一的执行状态**：`[ ]` 未验收、`[✅]` 通过、`[❌]` 验收失败（修复后重验）、
+  `[⚠️]` 受阻需用户处理；一个 Step 全部 `[✅]` 才进入下一 Step，全文全 `[✅]` 即子需求完成。
+  除此之外不记录任何状态、进度或 checkpoint。
+- 验收项与修改范围匹配：类型 / 结构改动用 type check，局部逻辑用单测，对外契约用契约测试，
+  持久化 / schema 用 schema 检查，UI 用路径验证，跨模块 / 破坏性契约按风险扩大到调用方。
+- Step 独立可执行、可验收，不依赖完整历史上下文；不过度细碎，以"较小上下文能可靠完成"为准。
+- 新项目（无 AGENTS.md）的编码层栈约束记录在文件头部，Phase 4 创建 AGENTS.md 时转入。
 
-### 状态与检查点
-
-```
-PENDING → IN_PROGRESS → VERIFYING → DONE
-                      → FAILED →（修复后）VERIFYING
-无法继续 → BLOCKED
-```
-
-- 状态取值：PENDING / IN_PROGRESS / VERIFYING / FAILED / BLOCKED / DONE。
-- **检查点（中断恢复用）**：在开始 Step、完成子任务、验证前后、暂停 / 请求用户输入时，
-  更新状态行下的两行，如：
-  `进度：已完成 LoginFilter 与单测`
-  `下一动作：跑集成验证，预期 401 返回结构符合契约`
-- 恢复流程见 SKILL.md Phase 3；文件记录是提示，代码是事实。
-
-## artifacts/memory.md（长期经验记忆；Phase 3 / Phase 4 追加）
+## artifacts/memory.md（Phase 4 沉淀）
 
 定位与职责边界见 document-contracts.md；本节只定写入判断与条目格式（主题式，一条一主题）：
 
@@ -131,17 +86,14 @@ Memory = 短、精确、高价值、可检索。
 
 ## 子需求完成后的清空格式（Phase 4）
 
-prd-sub.md / plan.md / execution-plan.md 三个临时文件清空内容、保留文件，只留一行职责标题
-（每个文件只写对应的那一行）：
+prd-sub.md / execution-plan.md 清空内容、保留文件，只留一行职责标题（每个文件只写对应的那一行）：
 
 ```markdown
 # prd-sub — 当前子需求（完成后清空）
-# plan — 当前子需求跨 Step 方案决策（完成后清空）
-# execution-plan — 当前子需求 Step 队列与状态（完成后清空）
+# execution-plan — 当前子需求 Step 与验收（完成后清空）
 ```
 
 要求：
 
 - **清空而不是删除**：文件必须继续存在；未创建过的文件不补建。
-- 三行内容各不相同，禁止写入 IDLE / 状态指针类重复内容。
 - memory.md 是长期文件，**不清空**；architecture.md 按 Phase 4 判断更新。

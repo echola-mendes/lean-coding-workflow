@@ -14,8 +14,7 @@
 | AGENTS.md | AI Coding 行为规范 | Permanent（必读，缺失视为无附加规则；缺失时 Phase 4 按实际约定创建） |
 | artifacts/architecture.md | 长期架构约束 | Permanent（有长期架构变化时创建 / 更新） |
 | artifacts/prd-sub.md | 当前子需求 | Temporary（完成后清空内容） |
-| artifacts/plan.md | 当前子需求整体方案 | Temporary（按需创建；完成后清空内容） |
-| artifacts/execution-plan.md | 当前子需求全部 Step 及状态行 + 验收清单 | Temporary（完成后清空内容） |
+| artifacts/execution-plan.md | 当前子需求全部 Step 与验收勾选 | Temporary（完成后清空内容） |
 | artifacts/memory.md | 项目长期经验记忆 | Permanent（不清空；禁止流水；必要时压缩） |
 
 禁止让多个文档承担相同职责。
@@ -42,7 +41,7 @@
 - 职责：技术栈、编码规范、命名规范、项目约定、测试规则、AI 修改代码必须遵守的规则、开发限制。
 - **必读**：Phase 1 / 2 / 3 每次读取；缺失视为无附加规则，不阻塞执行、不臆造规则。
 - 创建：项目缺失时，Phase 4 依据本轮**实际执行中采用的约定**创建（测试命令、命名、目录、
-  框架版本等），创建前告知用户；新项目的栈约束在 Phase 2 先记录于 plan.md。
+  框架版本等），创建前告知用户；新项目的栈约束在 Phase 2 先记录于 execution-plan.md 头部。
 - 已存在时禁止覆盖，只追加 / 修正。
 
 ### artifacts/architecture.md
@@ -66,27 +65,19 @@
 - 临时，只服务当前子需求；完成后清空内容、只留一行职责标题、禁止删除文件。
 - 是 AI 梳理后的需求，不是需求文档的复制。
 
-### artifacts/plan.md — 当前子需求跨 Step 方案决策记录
+### artifacts/execution-plan.md — 当前子需求全部 Step 与验收（唯一计划文件）
 
-- 临时，只记横跨多个 Step 的决策与理由（选型、数据模型、API 契约、模块划分、风险）；
-  不复述 Step 级实现细节；保持短（建议 ≤100 行）。
-- **按需创建**：仅当存在跨 Step 方案决策时创建；无则不建文件。
-- 新项目（无 AGENTS.md）的编码层栈约束在此过渡记录，Phase 4 创建 AGENTS.md 时转入。
-- 完成后清空内容、只留一行职责标题、禁止删除文件。
-
-### artifacts/execution-plan.md — 当前子需求全部 Step（含状态）+ 验收清单
-
-- Phase 2 生成：全部 Step（每个只有 目标 / 方案 / 验证 三节，格式见 file-formats.md）
-  与文末验收清单（从 prd-sub.md 验收标准转写，Phase 4 逐项验证）。
-- 每个 Step 带状态行与检查点；状态每次变更立即写回，它是 Step 进度的唯一持久载体。
-- Step 完成 → 标 DONE、正文压缩为一行验证结果；**不删除**，Phase 4 整体清空。
-- 它不是长期历史；长期经验进 memory.md。
+- Phase 2 生成：全部 Step，每个 Step 三节（目标 / 方案 / 验收，格式见 file-formats.md）。
+- **验收勾选是唯一执行状态**：`[ ]` 未验收 / `[✅]` 通过 / `[❌]` 验收失败 / `[⚠️]` 受阻；
+  全部 `[✅]` = 子需求完成；不记录其他状态、进度或 checkpoint；
+  中断后从第一个非 `[✅]` Step 继续，无独立恢复流程。
+- 完成后清空内容、只留一行职责标题、禁止删除文件；长期经验进 memory.md。
 
 ### artifacts/memory.md — 项目长期经验记忆
 
 - **Permanent，不清空**：项目级长期经验——踩坑与解法、"为什么这么做"的决策理由、可复现问题；
   不是执行流水（那随 execution-plan 清空），只收 PRD / architecture / AGENTS 放不下的经验。
-- Phase 3 每个 Step 完成后追加高价值信息；Phase 4 分流后追加经验条目。
+- Phase 4 沉淀：只记录值得长期保留的经验（分流规则见 SKILL.md Phase 4）。
 - 容量目标 ≤200 行（压缩规则见 file-formats.md）。
 
 ## 子需求完成清理规则（Phase 4）
@@ -97,6 +88,7 @@ memory.md 记录长期经验与决策理由，git 历史 + 用户原始需求文
 
 ## 禁止的设计
 
+- 验收勾选（`[ ]` / `[✅]` / `[❌]` / `[⚠️]`）即执行状态。
 - 巨大的 project-context.md；无限增长的 memory.md；memory.md 记录执行流水。
 - 新建 memory.md 之外的任何记忆文件。
 - 修改用户提供的原始需求文档（@xxx.md 只读）。

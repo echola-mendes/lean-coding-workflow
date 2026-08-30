@@ -29,7 +29,7 @@
 |---|---|
 | **Plan enough** | 对齐到位就动手：不欠计划，也不过度设计。 |
 | **Read only what you need** | 按需读取上下文，禁止猜测性读取。问的是「不读这个文件，当前任务是否无法可靠完成」，不是「读了会不会更有把握」。够了立刻停。 |
-| **Execute one step at a time** | 执行计划保留全部 Step 并维护状态行，状态变更即落盘；中断后凭状态行 + git diff 恢复。验证范围跟着修改范围走，不每个 Step 跑全量测试。 |
+| **Execute one step at a time** | 执行计划保留全部 Step，验收勾选即进度：勾完一个 Step 再下一个。验证范围跟着修改范围走，不每个 Step 跑全量测试。 |
 | **Remember what matters** | 每个文件只有一个职责。临时文档服务当前子需求，完成后清空；memory.md 只沉淀长期经验，禁止执行流水；只有会约束未来开发的决策才进长期文档。 |
 
 两条刻意不做的选择：
@@ -40,19 +40,19 @@
 ### 落地形态
 
 - **文档驱动开发**：需求 → 子需求 → 方案 → 执行计划 → 逐步执行 → 验证 → 沉淀 → 收尾。
-- **严格 Phase 状态机**：Phase 1 需求分析 → 确认① → Phase 2 方案规划 → 确认② → Phase 3 逐步执行 → Phase 4 子需求完成。
+- **严格 Phase 流程**：Phase 1 需求分析 → 确认① → Phase 2 方案规划 → 确认② → Phase 3 逐步执行 → Phase 4 子需求完成。
 - **长期 / 临时两层文档**：
   - 长期：`PRD.md`（需求状态，可选）、`AGENTS.md`（编码规则，必读）、`architecture.md`（架构约束，按需创建）、`memory.md`（长期经验）
-  - 临时：`prd-sub.md` / `plan.md`（按需）/ `execution-plan.md`
+  - 临时：`prd-sub.md` / `execution-plan.md`
 
 ## 工作流
 
 ```
 Phase 1 需求分析 ──→ 【用户确认①】prd-sub.md
    ↓
-Phase 2 方案规划 ──→ 【用户确认②】execution-plan.md（plan.md 按需）
+Phase 2 方案规划 ──→ 【用户确认②】execution-plan.md
    ↓
-Phase 3 Step 执行（一次一个 Step：标 IN_PROGRESS → 实现 → 最小验证 → 标 DONE，状态实时落盘）
+Phase 3 Step 执行（一次一个 Step：实现 → 验收 → 标 ✅ / ❌ / ⚠️，全部 ✅ 进入 Phase 4）
    ↓
 Phase 4 子需求完成（同步 PRD（若存在）/ 更新 architecture / 沉淀 AGENTS 与 memory → 清空临时文档）
 ```
@@ -69,8 +69,7 @@ project/
 └── artifacts/
     ├── architecture.md     # 长期：架构约束（有长期架构变化时创建 / 更新）
     ├── prd-sub.md          # 临时：当前子需求（完成后清空）
-    ├── plan.md             # 临时：跨 Step 方案决策（按需创建，完成后清空）
-    ├── execution-plan.md   # 临时：全部 Step（目标 / 方案 / 验证）+ 验收清单（完成后清空）
+    ├── execution-plan.md   # 临时：全部 Step（目标 / 方案 / 验收，勾选即状态，完成后清空）
     └── memory.md           # 长期：项目经验记忆（不清空，禁止流水，必要时压缩）
 ```
 

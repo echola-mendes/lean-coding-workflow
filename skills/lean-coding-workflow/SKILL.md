@@ -1,6 +1,7 @@
 ---
 name: lean-coding-workflow
 description: "Document-driven coding workflow with on-demand context, one-step execution, and acceptance checklists."
+version: 1.0.0
 disable-model-invocation: true
 ---
 

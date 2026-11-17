@@ -1,11 +1,11 @@
 {
   "name": "lean-coding-workflow",
-  "version": "1.0.0",
-  "description": "Document-driven coding workflow with on-demand context, one-step execution, minimal verification, and recoverable state.",
+  "version": "1.1.0",
+  "description": "Document-driven coding workflow with optional Java backend skills and Lanhu MCP integration.",
   "author": {
     "name": "echola"
   },
   "repository": "https://gitee.com/echola/lean-coding-workflow",
   "license": "Apache-2.0",
-  "keywords": ["workflow", "coding", "context-on-demand", "document-driven"]
+  "keywords": ["workflow", "coding", "context-on-demand", "document-driven", "java", "lanhu"]
 }

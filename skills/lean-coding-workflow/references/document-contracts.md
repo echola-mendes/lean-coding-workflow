@@ -14,7 +14,7 @@
 | AGENTS.md | AI Coding 行为规范（约定文件；Claude Code 回退 CLAUDE.md） | Permanent（必读；缺失时 Phase 4 按实际约定创建） |
 | artifacts/architecture.md | 长期架构约束 | Permanent（有长期架构变化时创建 / 更新） |
 | artifacts/prd-sub.md | 当前子需求 | Temporary（Phase 4 归档后保留；Phase 1 启动核对后清空） |
-| artifacts/execution-plan.md | 当前子需求全部 Step 与验收勾选 | Temporary（Phase 4 归档后保留；Phase 1 启动核对后清空） |
+| artifacts/execution-plan.md | 当前子需求全部 Step、验收勾选与需求变更追溯 | Temporary（Phase 4 归档后保留；Phase 1 启动核对后清空） |
 | artifacts/memory.md | 项目长期经验记忆 | Permanent（不清空；禁止流水；必要时压缩） |
 
 禁止让多个文档承担相同职责。
@@ -73,6 +73,12 @@
 - Phase 2 生成：全部 Step，每个 Step 三节（目标 / 方案 / 验收，格式见 file-formats.md）。
 - 验收勾选即唯一执行状态（四态定义与执行规则见 file-formats.md）；无独立恢复流程。
 - 生命周期（归档 / 清空）见 SKILL.md §2；长期经验进 memory.md。
+- Phase 3 需求变更只在本文件追加 CR 追溯并局部恢复受影响验收项；不得覆盖全文或创建 change-plan、checkpoint。
+
+### Dynamic Project Context — 非文档
+
+- 仅是调用 Java 外部能力前，根据当前 Step 动态整理的项目事实与来源，不落盘、不跨项目复用。
+- 不承担进度、记忆或恢复职责；恢复仍只依赖 `execution-plan.md`，再按当前 Step 重新发现项目事实。
 
 ### artifacts/memory.md — 项目长期经验记忆
 
@@ -92,6 +98,7 @@ memory.md 记录长期经验与决策理由，git 历史 + 用户原始需求文
 - 验收勾选（`[ ]` / `[✅]` / `[❌]` / `[⚠️]`）即执行状态。
 - 巨大的 project-context.md；无限增长的 memory.md；memory.md 记录执行流水。
 - 新建 memory.md 之外的任何记忆文件。
+- 持久化 project-context、checkpoint、change-plan 或外部 Skill 自己的任务状态。
 - 修改用户提供的原始需求文档（@xxx.md 只读）。
 - 在多个临时文件重复写入同一份状态指针 / IDLE 占位内容。
 - 自动创建 AGENTS.md / PRD.md / 任何工作文件（仅用户明确要求时创建）。

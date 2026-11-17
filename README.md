@@ -19,6 +19,10 @@
 
 `lean‑coding‑workflow` 是一套文档驱动的 Skill：只加载最小必要上下文，计划、执行与验收结果全部落在文件里——新开对话照着文件就能继续做，不依赖历史对话。
 
+当前 `java-integration` 分支在通用流程上增加可选的 Java Backend 集成：从 Lanhu MCP 获取需求事实，
+并按 Phase 发现 backend-skill 的 `proj-*` 能力。两者均不内嵌、也不是运行前提；未安装时由 Lean 使用
+自身等价能力继续执行。
+
 这个 Skill 不是又一个「请仔细思考再动手」的提示词。它把上述失败模式写成**可执行约束**：什么时候读、读到什么程度停、何时问人、一次改多大、验证改多大、什么进长期文档、临时文档何时清。
 
 目标是压低 `context_usage`；手段是语义判断「这一步够不够」，而不是盯着百分比刹车。
@@ -60,6 +64,16 @@ Phase 4 子需求完成（同步 PRD（若存在）/ 更新 architecture / 归�
 ```
 
 正常流程只有两个强制确认点。Step 执行过程中不逐步请示；仅在需求歧义、重大架构或方案变化、计划与实际冲突、验收失败无法自行解决、高风险操作时暂停。
+
+### Java 集成
+
+调用 Java 外部能力前，工作流会按当前 Step 从构建文件、配置、相关源码、测试和项目约定动态识别
+实际技术栈。该上下文只用于当次调用，不写入项目文件；项目事实始终优先于 backend-skill 的默认环境，
+普通需求不会夹带 Java、Spring Boot、Redis、核心依赖或测试框架升级。
+
+Phase 3 的 Java 代码 Step 按“实现 → Review → 必要测试更新 → Lean 执行 Maven / Gradle 测试 → 验收”
+闭环。需求变更使用 `CR-001` 等 ID 局部修补原 `execution-plan.md`，保留不受影响的完成项；
+`execution-plan.md` 始终是唯一进度来源。
 
 ## 项目目录约定
 
@@ -144,8 +158,9 @@ lean-coding-workflow/
 │       ├── agents/
 │       │   └── openai.yaml         # UI 元数据（列表展示名 / chips / 默认 prompt）
 │       └── references/
-│           ├── file-formats.md     # prd-sub /  execution-plan / memory 格式模板
-│           └── document-contracts.md
+│           ├── file-formats.md     # prd-sub / execution-plan / memory 格式模板
+│           ├── document-contracts.md
+│           └── java-backend-workflow.md # Java / Lanhu 规则（按需读取）
 ├── .gitignore
 ├── LICENSE
 └── README.md

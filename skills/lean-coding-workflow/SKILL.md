@@ -1,8 +1,6 @@
 ---
 name: lean-coding-workflow
-description: "Document-driven coding workflow with on-demand context, one-step execution, and acceptance checklists."
-version: 1.0.0
-disable-model-invocation: true
+description: "Explicit document-driven coding workflow with on-demand context, stepwise verification, and optional Java/Lanhu integration."
 ---
 
 # Lean Coding Workflow
@@ -19,7 +17,7 @@ disable-model-invocation: true
 
 继续未完成工作时按文件内容判定（只读所需的一个文件）：
 `artifacts/execution-plan.md` 存在：
-- 存在 `[❌]` 验收项 → Phase 3 续做；
+- 存在任意非 `[✅]` 验收项 → Phase 3 从第一个此类 Step 续做；
 - 存在 `[⚠️]` 验收项 → 根据该项说明判断是否仍需继续；若需继续则 Phase 3，否则视为遗留项；
 - 全部 `[✅]` → 当前子需求已完成，不续做。
 若 `execution-plan.md` 不存在：
@@ -43,6 +41,8 @@ memory 长期不清空；用户需求文档只读，永不修改。
 
 - `references/file-formats.md` — 写各 workflow 文件、清空临时文档之前读取（格式模板）。
 - `references/document-contracts.md` — 职责边界有疑问，或 Phase 2 / 4 需要判断依据时读取。
+- `references/java-backend-workflow.md` — 输入含 Lanhu URL、当前项目是 Java 或 Phase 3 发生需求变更时读取一次；
+  后续按当前 Phase 执行对应章节。
 
 ## 3. 流程
 
@@ -58,7 +58,8 @@ Phase 1 需求分析 →【确认①】→ Phase 2 方案规划 →【确认②�
 - 存在旧 prd-sub / execution-plan → 按 §2 重建点收尾（核对沉淀 → 清空 → 压缩 memory）；
   禁止跳过收尾直接写入新 prd-sub.md。
 - 写 `artifacts/prd-sub.md`（目录不存在则创建）：AI 梳理后的可执行子需求，不是需求复制；
-  不添加无依据的业务规则；信息不足列入"待确认问题"。
+  不添加无依据的业务规则；信息不足列入"待确认问题"；内容必须区分 Confirmed Requirement、
+  Code-derived Fact、Technical Inference、Unknown / Need Confirmation，不得把推断当成产品需求。
 - 禁止：编码、改业务源码、写其他 workflow 文件、改用户需求文档。
 - **【确认①】** 展示：需求理解 / 功能范围 / 非目标 / 业务规则 / 验收标准 / 待确认问题；确认后 → Phase 2。
 
@@ -85,6 +86,10 @@ Phase 1 需求分析 →【确认①】→ Phase 2 方案规划 →【确认②�
    前置 Step 修改并重验；重新执行受影响 Step 的验收，通过后改 `[✅]` 继续。
 4. 无法自行解决 → 标 `[⚠️]`，暂停向用户说明。暂停请示仅限：需求歧义 / 重大架构或方案变化 /
    计划与实际严重冲突 / 高风险操作 / 需要用户提供信息。
+
+#### Phase 3 需求变更
+
+按 `references/java-backend-workflow.md` 的 Change Flow 执行。
 
 ### Phase 4：完成
 

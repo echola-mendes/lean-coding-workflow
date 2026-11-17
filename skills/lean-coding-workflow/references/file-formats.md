@@ -24,6 +24,8 @@ Phase 4 沉淀经验之前。
 - 是 AI 梳理后的**可执行子需求**，不是用户需求文档的简单复制。
 - 不添加用户没有要求且没有依据的业务规则。
 - 信息不足时明确列入"待确认问题"，不要自行臆测补全。
+- 存在外部需求源、代码事实或技术分析时，分别标注 `Confirmed Requirement`、`Code-derived Fact`、
+  `Technical Inference`、`Unknown / Need Confirmation`；技术推断不得写成已确认业务规则。
 
 ## artifacts/execution-plan.md（Phase 2 生成）
 
@@ -59,6 +61,23 @@ Phase 4 沉淀经验之前。
   持久化 / schema 用 schema 检查，UI 用路径验证，跨模块 / 破坏性契约按风险扩大到调用方。
 - Step 独立可执行、可验收，不依赖完整历史上下文；不过度细碎，以"较小上下文能可靠完成"为准。
 - 新项目（无约定文件 AGENTS/CLAUDE.md）的编码层栈约束记录在文件头部，Phase 4 创建约定文件时转入。
+
+### Phase 3 Change History（仅发生需求变更时）
+
+在原文件末尾追加最小追溯记录，不创建新文件：
+
+```markdown
+## Change History
+
+### CR-001：<变更摘要>
+- 变更内容：<用户确认的变化>
+- 影响范围：<模块 / 契约 / 数据 / 测试>
+- 变更计划：<必要修改与验证>
+- 受影响 Step：Step 2、Step 3
+```
+
+受影响的原验收项从 `[✅]` 改回 `[ ]` 并在文本末尾标注 `(CR-001)`；只有无法放入原 Step 的必要工作
+才追加 `Change Step`。Change ID 只做追溯，不表达执行状态；进度仍只看验收勾选。
 
 ## artifacts/memory.md（项目长期记忆）
 

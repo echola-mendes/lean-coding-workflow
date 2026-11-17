@@ -55,9 +55,9 @@ Project Discovery 后调用可用的 `proj-analyze-design`，辅助分析 API、
 
 ### Phase 3
 
-Java 代码 Step 执行：Project Discovery → 可用时 `proj-gen` → 实现 → 可用时 `proj-review` → 必要修复 →
-需要测试变更时调用可用的 `proj-gen-test` → Lean 按 Maven / Gradle 实际执行测试 → Lean 按原标准验收。
-`proj-gen-test` 只修改测试代码；Review 必须按项目实际版本、规范和架构约束执行。
+Java 代码实现前仅检查项目 `.agents/skills/*/SKILL.md` 的 frontmatter；匹配的实现型 Skill 替代 `proj-gen`，
+否则依次回退 `proj-gen`、Lean。禁止加载无关 Skill 或同时调用两个实现型 Skill。随后执行 `proj-review`、
+必要修复和 `proj-gen-test`，由 Lean 按 Maven / Gradle 测试并验收；项目 Skill 继续约束后续环节，其自检不替代闭环。
 
 ## Change Flow
 
@@ -67,7 +67,7 @@ Phase 3 需求变更时：
 2. 调用可用的 `proj-change` 获取影响分析和变更计划；不可用时由 Lean 完成。
 3. 在原 `execution-plan.md` Change History 记录变更、影响、计划和受影响 Step；仅将受影响 `[✅]` 改回
    `[ ]` 并标注 CR ID。保留无关 `[✅]`；按影响调整原 Step，只在必要时追加 Change Step。
-4. 从第一个存在非 `[✅]` 验收项的 Step 继续 Phase 3 闭环。
+4. 从第一个存在非 `[✅]` 验收项的 Step 继续 Phase 3 闭环；代码实现沿用 Phase 3 的项目级 Skill 优先规则。
 
 CR ID 只用于追溯。禁止新增 TODO / IN_PROGRESS / PAUSED / DONE / SUPERSEDED、checkpoint、change-plan 或
 其他状态文件；`execution-plan.md` 始终是唯一进度来源，不增加固定确认点。

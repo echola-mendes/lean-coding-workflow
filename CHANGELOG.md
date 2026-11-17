@@ -8,6 +8,7 @@
 
 - Java Project Discovery 与调用级 Dynamic Project Context，项目实际版本优先且禁止普通需求隐式升级
 - 可选 Lanhu MCP 需求源，以及 backend-skill 的需求、设计、生成、审查、测试和变更能力编排
+- Phase 3 优先使用匹配的项目级实现 Skill；仅在缺失时回退 `proj-gen`，避免职责重叠和规则冲突
 - Phase 3 Change Flow：CR ID、局部恢复受影响验收项、保留未受影响完成状态
 
 ### 变更 (Changed)

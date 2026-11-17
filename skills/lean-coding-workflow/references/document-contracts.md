@@ -9,19 +9,19 @@
 
 | 文件 | 职责 | 生命周期 |
 |---|---|---|
-| PRD.md | 项目当前最终需求状态 | Permanent（可选：存在才在 Phase 4 同步） |
+| docs/PRD.md | 项目当前最终需求状态 | Permanent（可选：存在才在 Phase 4 同步） |
 | @xxx.md / PRD-Vx.md | 用户指定的需求来源 | Permanent（用户所有，只读） |
 | AGENTS.md | AI Coding 行为规范（约定文件；Claude Code 回退 CLAUDE.md） | Permanent（必读；缺失时 Phase 4 按实际约定创建） |
-| artifacts/architecture.md | 长期架构约束 | Permanent（有长期架构变化时创建 / 更新） |
-| artifacts/prd-sub.md | 当前子需求 | Temporary（Phase 4 归档后保留；Phase 1 启动核对后清空） |
-| artifacts/execution-plan.md | 当前子需求全部 Step、验收勾选与需求变更追溯 | Temporary（Phase 4 归档后保留；Phase 1 启动核对后清空） |
-| artifacts/memory.md | 项目长期经验记忆 | Permanent（不清空；禁止流水；必要时压缩） |
+| docs/artifacts/architecture.md | 长期架构约束 | Permanent（有长期架构变化时创建 / 更新） |
+| docs/artifacts/prd-sub.md | 当前子需求 | Temporary（Phase 4 归档后保留；Phase 1 启动核对后清空） |
+| docs/artifacts/execution-plan.md | 当前子需求全部 Step、验收勾选与需求变更追溯 | Temporary（Phase 4 归档后保留；Phase 1 启动核对后清空） |
+| docs/artifacts/memory.md | 项目长期经验记忆 | Permanent（不清空；禁止流水；必要时压缩） |
 
 禁止让多个文档承担相同职责。
 
 ## 各文件契约
 
-### PRD.md
+### docs/PRD.md
 
 - 职责：表示"当前项目最终需要实现什么"。**可选文件**：不存在则不创建、不同步
   （用户明确要求时才创建），不阻塞流程。
@@ -47,7 +47,7 @@
   （宿主可自动加载），禁止覆盖；新项目的栈约束在 Phase 2 先记录于 execution-plan.md 头部。
 - 已存在时禁止覆盖，只追加 / 修正。
 
-### artifacts/architecture.md
+### docs/artifacts/architecture.md
 
 - 职责：只记录长期有效的结构性信息 —— 模块边界、目录结构原则、系统分层、
   技术选型、数据架构、API 架构、Agent / Tool 架构、长期组件、长期设计约束。
@@ -63,12 +63,12 @@
   Bug 修复、普通字段增加、普通 SQL 修改。
 - 禁止：记录执行历史、Step 日志、测试日志。
 
-### artifacts/prd-sub.md — 当前子需求
+### docs/artifacts/prd-sub.md — 当前子需求
 
 - 临时，只服务当前子需求（生命周期见 SKILL.md §2），禁止删除文件。
 - 是 AI 梳理后的需求，不是需求文档的复制。
 
-### artifacts/execution-plan.md — 当前子需求全部 Step 与验收（唯一计划文件）
+### docs/artifacts/execution-plan.md — 当前子需求全部 Step 与验收（唯一计划文件）
 
 - Phase 2 生成：全部 Step，每个 Step 三节（目标 / 方案 / 验收，格式见 file-formats.md）。
 - 验收勾选即唯一执行状态（四态定义与执行规则见 file-formats.md）；无独立恢复流程。
@@ -80,7 +80,7 @@
 - 仅是调用 Java 外部能力前，根据当前 Step 动态整理的项目事实与来源，不落盘、不跨项目复用。
 - 不承担进度、记忆或恢复职责；恢复仍只依赖 `execution-plan.md`，再按当前 Step 重新发现项目事实。
 
-### artifacts/memory.md — 项目长期经验记忆
+### docs/artifacts/memory.md — 项目长期经验记忆
 
 - **Permanent，不清空**：项目级长期记忆——完成记录表（一行一子需求）+ 经验条目（踩坑与解法、
   "为什么这么做"的决策理由、可复现问题）；只收 PRD / architecture / AGENTS 放不下的内容；
@@ -90,7 +90,7 @@
 ## 子需求完成清理规则（Phase 4）
 
 清理动作以 SKILL.md Phase 4 为准，生命周期见职责速查表；此处只保留历史溯源约定——
-溯源不依赖临时文件：PRD.md（若存在）记录最终需求结果，architecture.md 记录长期架构变化，
+溯源不依赖临时文件：docs/PRD.md（若存在）记录最终需求结果，architecture.md 记录长期架构变化，
 memory.md 记录长期经验与决策理由，git 历史 + 用户原始需求文档（只读）保留完整过程与需求来源。
 
 ## 禁止的设计
@@ -101,7 +101,7 @@ memory.md 记录长期经验与决策理由，git 历史 + 用户原始需求文
 - 持久化 project-context、checkpoint、change-plan 或外部 Skill 自己的任务状态。
 - 修改用户提供的原始需求文档（@xxx.md 只读）。
 - 在多个临时文件重复写入同一份状态指针 / IDLE 占位内容。
-- 自动创建 AGENTS.md / PRD.md / 任何工作文件（仅用户明确要求时创建）。
+- 自动创建 AGENTS.md / docs/PRD.md / 任何工作文件（仅用户明确要求时创建）。
 - 每个 Step 自动读取所有文档 / 整个 architecture.md / 整个 memory.md。
 - 每个 Step 自动运行完整测试。
 - 自动扫描整个项目源码；自动读取所有 PRD-Vx.md。

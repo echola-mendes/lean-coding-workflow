@@ -48,7 +48,7 @@
 - **文档驱动开发**：需求 → 子需求 → 执行计划 → 逐步执行 → 验收 → 沉淀 → 收尾。
 - **严格 Phase 流程**：Phase 1 需求分析 → 确认① → Phase 2 方案规划 → 确认② → Phase 3 逐步执行 → Phase 4 子需求完成。
 - **长期 / 临时两层文档**：
-  - 长期：`PRD.md`（需求状态，可选）、`AGENTS.md`（编码规则，必读）、`architecture.md`（架构约束，按需创建）、`memory.md`（长期经验）
+  - 长期：`docs/PRD.md`（需求状态，可选）、`AGENTS.md`（项目根编码规则，必读）、`architecture.md`（架构约束，按需创建）、`memory.md`（长期经验）
   - 临时：`prd-sub.md` / `execution-plan.md`（归档后保留，下个子需求启动时清空）
 
 ## 工作流
@@ -79,14 +79,15 @@ Phase 3 的 Java 代码 Step 按“实现 → Review → 必要测试更新 → 
 
 ```
 project/
-├── PRD.md                  # 长期：项目当前最终需求状态（可选：存在才同步）
-├── PRD-V1.md …             # 长期：版本化需求（可选；也可用任意 @xxx.md 作为需求入口，只读）
-├── AGENTS.md               # 长期：AI 编码规则（必读；Claude Code 项目回退 CLAUDE.md；缺失时 Phase 4 创建）
-└── artifacts/
-    ├── architecture.md     # 长期：架构约束（有长期架构变化时创建 / 更新）
-    ├── prd-sub.md          # 临时：当前子需求（归档后保留，下个子需求启动时清空）
-    ├── execution-plan.md   # 临时：全部 Step（目标 / 方案 / 验收，勾选即状态）
-    └── memory.md           # 长期：项目经验记忆（不清空，禁止流水，必要时压缩）
+├── AGENTS.md                   # 项目根：AI 编码规则（必读；Claude Code 项目回退 CLAUDE.md；缺失时 Phase 4 创建）
+└── docs/
+    ├── PRD.md                  # 长期：项目当前最终需求状态（可选：存在才同步）
+    ├── PRD-V1.md …             # 长期：版本化需求（可选；也可用任意 @xxx.md 作为需求入口，只读）
+    └── artifacts/
+        ├── architecture.md     # 长期：架构约束（有长期架构变化时创建 / 更新）
+        ├── prd-sub.md          # 临时：当前子需求（归档后保留，下个子需求启动时清空）
+        ├── execution-plan.md   # 临时：全部 Step（目标 / 方案 / 验收，勾选即状态）
+        └── memory.md           # 长期：项目经验记忆（不清空，禁止流水，必要时压缩）
 ```
 
 各文件的职责、生命周期与创建时机详见 `skills/lean-coding-workflow/references/document-contracts.md`。
@@ -139,7 +140,7 @@ git clone https://gitee.com/echola/lean-coding-workflow.git ~/.claude/skills/lea
 ```
 
 ```
-/lean-coding-workflow @PRD-V1.md
+/lean-coding-workflow @docs/PRD-V1.md
 /lean-coding-workflow @docs/travel-approval.md
 /lean-coding-workflow @requirements/mqtt.md
 ```

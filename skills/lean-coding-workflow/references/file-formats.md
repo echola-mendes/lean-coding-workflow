@@ -3,7 +3,7 @@
 读取时机：Phase 1 生成 prd-sub.md 与收尾上一子需求、Phase 2 生成 execution-plan.md、
 Phase 4 沉淀经验之前。
 
-## artifacts/prd-sub.md（Phase 1 生成）
+## docs/artifacts/prd-sub.md（Phase 1 生成）
 
 ```markdown
 # 当前子需求
@@ -27,7 +27,7 @@ Phase 4 沉淀经验之前。
 - 存在外部需求源、代码事实或技术分析时，分别标注 `Confirmed Requirement`、`Code-derived Fact`、
   `Technical Inference`、`Unknown / Need Confirmation`；技术推断不得写成已确认业务规则。
 
-## artifacts/execution-plan.md（Phase 2 生成）
+## docs/artifacts/execution-plan.md（Phase 2 生成）
 
 当前子需求的全部 Step（完成后 Phase 4 清空）。每个 Step 三节：
 
@@ -79,7 +79,7 @@ Phase 4 沉淀经验之前。
 受影响的原验收项从 `[✅]` 改回 `[ ]` 并在文本末尾标注 `(CR-001)`；只有无法放入原 Step 的必要工作
 才追加 `Change Step`。Change ID 只做追溯，不表达执行状态；进度仍只看验收勾选。
 
-## artifacts/memory.md（项目长期记忆）
+## docs/artifacts/memory.md（项目长期记忆）
 
 定位与职责边界见 document-contracts.md。结构两层：
 
@@ -108,7 +108,7 @@ Phase 4 沉淀经验之前。
 要求：
 
 - 经验写入前判断："这条信息未来是否有助于后续子需求、问题排查或理解重要决策？
-  且是否属于架构（→ architecture.md）、编码规则（→ AGENTS.md）、需求结果（→ PRD.md）之外的经验？"
+  且是否属于架构（→ architecture.md）、编码规则（→ AGENTS.md）、需求结果（→ docs/PRD.md）之外的经验？"
   NO 不记录，YES 才记录。
 - 禁止记录：Agent 思维过程、完整源码、完整测试输出、命令流水、按 Step 展开的执行流水、重复信息。
 - 容量：全文 <300 行；超过时合并重复、淘汰低价值条目，**不得简单截断**（截断会无声丢失条目）。

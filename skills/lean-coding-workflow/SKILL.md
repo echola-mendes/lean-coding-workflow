@@ -16,18 +16,18 @@ description: "Explicit document-driven coding workflow with on-demand context, s
 ## 1. 进入
 
 继续未完成工作时按文件内容判定（只读所需的一个文件）：
-`artifacts/execution-plan.md` 存在：
+`docs/artifacts/execution-plan.md` 存在：
 - 存在任意非 `[✅]` 验收项 → Phase 3 从第一个此类 Step 续做；
 - 存在 `[⚠️]` 验收项 → 根据该项说明判断是否仍需继续；若需继续则 Phase 3，否则视为遗留项；
 - 全部 `[✅]` → 当前子需求已完成，不续做。
 若 `execution-plan.md` 不存在：
-- `artifacts/prd-sub.md` 有内容 → 停在确认点①；
+- `docs/artifacts/prd-sub.md` 有内容 → 停在确认点①；
 - 否则 → Phase 1。
 
 ## 2. 文件
 
-约定文件 `AGENTS.md`（必读；缺失时回退 `CLAUDE.md`，两者都缺视为无附加规则）与 `PRD.md`（可选）在项目根；
-workflow 文件在 `artifacts/`：architecture / prd-sub / execution-plan / memory。
+约定文件 `AGENTS.md`（必读；缺失时回退 `CLAUDE.md`，两者都缺视为无附加规则）在项目根；`docs/PRD.md` 可选；
+workflow 文件在 `docs/artifacts/`：architecture / prd-sub / execution-plan / memory。
 职责与生命周期以 `references/document-contracts.md` 为准。临时文件生命周期（prd-sub / execution-plan）：
 - 归档点（Phase 4 完成）：总结两文件 → 写入 memory.md 完成记录 → 两文件保留不动。
 - 重建点（下一子需求启动，Phase 1）：读旧文件 → 核对 memory 已有本轮记录（缺失则补写）→
@@ -57,7 +57,7 @@ Phase 1 需求分析 →【确认①】→ Phase 2 方案规划 →【确认②�
 - 读：当前对话 + 用户 @ 的需求文档 + 约定文件（§2，缺失视为无附加规则）；按需 architecture / 相关源码。
 - 存在旧 prd-sub / execution-plan → 按 §2 重建点收尾（核对沉淀 → 清空 → 压缩 memory）；
   禁止跳过收尾直接写入新 prd-sub.md。
-- 写 `artifacts/prd-sub.md`（目录不存在则创建）：AI 梳理后的可执行子需求，不是需求复制；
+- 写 `docs/artifacts/prd-sub.md`（目录不存在则创建）：AI 梳理后的可执行子需求，不是需求复制；
   不添加无依据的业务规则；信息不足列入"待确认问题"；内容必须区分 Confirmed Requirement、
   Code-derived Fact、Technical Inference、Unknown / Need Confirmation，不得把推断当成产品需求。
 - 禁止：编码、改业务源码、写其他 workflow 文件、改用户需求文档。
@@ -66,13 +66,13 @@ Phase 1 需求分析 →【确认①】→ Phase 2 方案规划 →【确认②�
 ### Phase 2：方案规划
 
 - 读：prd-sub.md + 约定文件（§2）；按需 architecture / 相关源码 / memory 经验条目。
-- 写 `artifacts/execution-plan.md`：全部 Step，每个 Step 三节——目标 / 方案 / 验收（`- [ ]` 清单项）。
+- 写 `docs/artifacts/execution-plan.md`：全部 Step，每个 Step 三节——目标 / 方案 / 验收（`- [ ]` 清单项）。
   验收与修改范围匹配：类型改动用 type check，局部逻辑用单测，对外契约用契约测试，
   持久化用 schema 检查，UI 用路径验证，跨模块按风险扩大到调用方。格式见 file-formats.md。
 - 按判断标准（document-contracts.md）写 architecture.md：新项目首次结构性决策必须产出架构设计并写入；
   已有项目仅存在长期架构变化时更新。
 - 编码栈约束属约定文件（§2）：存在则同步；不存在先记 execution-plan.md 头部，Phase 4 转入。
-- 禁止：改业务源码、执行 Step、写 memory、改 PRD.md。
+- 禁止：改业务源码、执行 Step、写 memory、改 `docs/PRD.md`。
 - **【确认②】** 展示：技术方案 / Step 划分与依赖 / 验收方式；确认后 → Phase 3。
 
 ### Phase 3：Step 执行
@@ -95,7 +95,7 @@ Phase 1 需求分析 →【确认①】→ Phase 2 方案规划 →【确认②�
 
 所有 Step 的验收项均为 `[✅]` → 本次子需求完成：
 
-1. PRD.md 存在则同步本次需求结果（不存在不创建）。
+1. `docs/PRD.md` 存在则同步本次需求结果（不存在不创建）。
 2. architecture.md 仅在存在架构变化时创建或更新（判断标准见 document-contracts.md）。
 3. 约定文件缺失时按本轮实际执行的约定创建（AGENTS.md；已有 CLAUDE.md 且无 AGENTS.md 则追加其中），
    创建前告知用户。
